@@ -6,6 +6,16 @@ from src import utils
 # Page config
 st.set_page_config(page_title="Treevia LC", layout="wide")
 
+# Logo
+logo_path="assets/treevia-logo.png"
+name_path="assets/treevia-name.png"
+st.logo(logo_path)
+
+# Sidebar
+with st.sidebar:
+    st.image(name_path)
+    st.multiselect("Cliente(s)", ["Green", "Yellow"])
+
 # API Calls
 estq = utils.call_estoque()
 devc = utils.call_device()
@@ -66,13 +76,11 @@ with col1:
     st.metric("Sensores em Estoque", estq_val, help="Número de sensores disponíveis para envio para clientes.")
     st.metric("Sensores problemáticos", prob_val, help="Número de sensores com qualquer status de categoria \"P\".")
     st.metric("Sensores com clientes", client_val, help="Número de sensores na possesão de cliente.s")
-    
-    
-with col3:
-    st.plotly_chart(make_status_pie(), use_container_width=True)
-    
 
 with col2:
     st.plotly_chart(make_client_bar(), use_container_width=True)
+    
+with col3:
+    st.plotly_chart(make_status_pie(), use_container_width=True)   
     
 st.dataframe(exch_data)
