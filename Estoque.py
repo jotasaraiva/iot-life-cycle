@@ -1,4 +1,7 @@
 import streamlit as st
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
 import pandas as pd
 import plotly.express as px
 from src import utils
@@ -10,11 +13,6 @@ st.set_page_config(page_title="Treevia LC", layout="wide")
 logo_path="assets/treevia-logo.png"
 name_path="assets/treevia-name.png"
 st.logo(logo_path)
-
-# Sidebar
-with st.sidebar:
-    st.image(name_path)
-    st.multiselect("Cliente(s)", ["Green", "Yellow"])
 
 # API Calls
 estq = utils.call_estoque()
@@ -33,6 +31,8 @@ devc_data = devc_data[['id', 'devc_cd_macaddress_treevia']]
 estq_data = pd.DataFrame(estq.json())
 estq_data = estq_data.astype(str)
 estq_data['data'] = pd.to_datetime(estq_data['data'])
+estq_data['cliente'] = utils.translate_clients(estq_data['cliente'])
+clients = list(utils.translate_clients(estq_data['cliente']).unique())
 
 # Gauges
 estq_size = estq_data.shape[0]
@@ -42,7 +42,7 @@ client_val = estq_data.loc[estq_data['status'] == 'Enviado para cliente'].shape[
 
 # Bars
 def make_client_bar():
-    n_client = (estq_data
+    n_client = (estq_data_filter
         .groupby(['cliente'])
         .size()
         .to_frame("size")
@@ -50,7 +50,6 @@ def make_client_bar():
         .sort_values('size'))
     
     n_client['percent'] = n_client['size']/n_client['size'].sum()
-    n_client['cliente'] = utils.translate_clients(n_client['cliente'])
     fig = px.bar(n_client, x='size', y='cliente', labels={'size': 'N° de Sensores', 'cliente': 'Cliente'}, )
     fig.update_layout(margin=dict(t=10, b=10), height=300)
 
@@ -70,6 +69,15 @@ def make_status_pie():
     return fig
 
 # Layout
+with st.sidebar:
+    st.image(name_path)
+    options = st.multiselect("Cliente(s)", clients)
+
+if len(options) == 0:
+    estq_data_filter = estq_data
+else:
+    estq_data_filter = estq_data.loc[estq_data['cliente'].isin(options)]
+
 col1, col2, col3= st.columns((.20, .40, .40), gap="small")
 
 with col1:
@@ -82,5 +90,5 @@ with col2:
     
 with col3:
     st.plotly_chart(make_status_pie(), use_container_width=True)   
-    
-st.dataframe(exch_data)
+
+st.dataframe(exch_data, height=300, use_container_width=True)

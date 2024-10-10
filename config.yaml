@@ -1,0 +1,11 @@
+credentials:
+  usernames:
+    admin:
+      email: joao.saraiva@treevia.com.br
+      logged_in: False
+      name: João Saraiva
+      password: 12345678
+cookie:
+  expiry_days: 1
+  key: some_signature_ley
+  name: some_cookie_name
