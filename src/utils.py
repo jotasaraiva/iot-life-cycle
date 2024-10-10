@@ -11,6 +11,17 @@ def call_device():
     devc = rqs.get(st.secrets["device_url"])
     return devc
 
+@st.cache_data
+def call_hw():
+    hw = rqs.get(st.secrets["hardware_url"])
+    return hw
+
+@st.cache_data
+def call_exchange():
+    exch = rqs.get(st.secrets["exchange_url"])
+    return exch
+
+
 def value_to_hex_color_g2r(value, max_value):
     if value < 0 or max_value <= 0 or value > max_value:
         raise ValueError("Value must be between 0 and max_value.")
@@ -40,7 +51,6 @@ def value_to_hex_color_r2g(value, max_value):
     # Construct the hex color
     hex_color = f'#{green:02X}{red:02X}00'
     return hex_color
-
 
 def translate_clients(series):
     translation_dict = {
