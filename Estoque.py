@@ -77,8 +77,6 @@ def make_status_pie(x):
     fig.update_layout(margin=dict(t=20, b=20, l=50, r=5), height=300)
     return fig
 
-
-
 # Layout
 if st.session_state['authentication_status']:
 
