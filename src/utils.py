@@ -1,22 +1,22 @@
 import streamlit as st
 import requests as rqs
 
-@st.cache_data
+@st.cache_data(show_spinner="Carregando Estoque...")
 def call_estoque():
     estq = rqs.get(st.secrets["estoque_url"])
     return estq
 
-@st.cache_data
+@st.cache_data(show_spinner="Carregando Devices...")
 def call_device():
     devc = rqs.get(st.secrets["device_url"])
     return devc
 
-@st.cache_data
+@st.cache_data(show_spinner="Carregando Hardwares...")
 def call_hw():
     hw = rqs.get(st.secrets["hardware_url"])
     return hw
 
-@st.cache_data
+@st.cache_data(show_spinner="Carregando Trocas...")
 def call_exchange():
     exch = rqs.get(st.secrets["exchange_url"])
     return exch

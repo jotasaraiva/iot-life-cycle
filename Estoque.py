@@ -87,6 +87,9 @@ if st.session_state['authentication_status']:
         data_inicial = st.date_input(label="Data Inicial", value=datetime(2023, 1, 1))
         data_final = st.date_input(label="Data Final", value='today')
     
+    # Logout
+    authenticator.logout(location='sidebar')
+
     # API Calls
     estq = utils.call_estoque()
     devc = utils.call_device()
@@ -132,9 +135,6 @@ if st.session_state['authentication_status']:
     # Row 2
     col_names = {'cliente':'Cliente', 'status': 'Status', 'mac': 'MAC', 'data': 'Data', 'devc_is_refurbished':'Remanufaturado?'}
     st.dataframe(estq_data[['cliente', 'status', 'mac', 'data', 'devc_is_refurbished']].rename(columns=col_names), height=280, use_container_width=True, hide_index=True)
-
-    # Logout
-    authenticator.logout(location='sidebar')
 
 elif st.session_state['authentication_status'] is False:
     st.toast('Usuário/Senha inválidos.')
