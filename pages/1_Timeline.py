@@ -2,6 +2,9 @@ import streamlit as st
 
 st.set_page_config(page_title="Treevia LC - Timeline")
 
+if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
+    st.switch_page('Estoque.py')
+
 # Logo
 logo_path="assets/treevia-logo.png"
 name_path="assets/treevia-name.png"
