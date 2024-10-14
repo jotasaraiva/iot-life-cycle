@@ -14,7 +14,7 @@ st.set_page_config(page_title="Treevia LC", layout="wide")
 logo_path="assets/treevia-logo.png"
 name_path="assets/treevia-name.png"
 st.logo(logo_path)
-st.sidebar.image(name_path, use_column_width=True, )
+st.sidebar.image(name_path, use_column_width=True)
 
 # Custom CSS
 st.markdown("""
@@ -79,6 +79,9 @@ def make_status_pie(x):
 
 # Layout
 if st.session_state['authentication_status']:
+    # Save authentication state
+    if 'authenticator' not in st.session_state:
+        st.session_state['authenticator'] = authenticator
 
     # Date filter
     with st.sidebar:
@@ -91,11 +94,6 @@ if st.session_state['authentication_status']:
     # API Calls
     estq = utils.call_estoque()
     devc = utils.call_device()
-    exch = utils.call_exchange()
-
-    # Exchange data
-    exch_data = pd.DataFrame(exch.json()['result'])
-    exch_data['date'] = pd.to_datetime(exch_data['exch_ts_unix_timestamp'], unit='ms')
 
     # Device data
     devc_data = pd.DataFrame(devc.json()['result'])
@@ -133,9 +131,7 @@ if st.session_state['authentication_status']:
     # Row 2
     col_names = {'cliente':'Cliente', 'status': 'Status', 'mac': 'MAC', 'data': 'Data', 'devc_is_refurbished':'Remanufaturado?'}
     st.dataframe(estq_data[['cliente', 'status', 'mac', 'data', 'devc_is_refurbished']].rename(columns=col_names), height=280, use_container_width=True, hide_index=True)
-
 elif st.session_state['authentication_status'] is False:
     st.toast('Usuário/Senha inválidos.')
-
 elif st.session_state['authentication_status'] is None:
     st.toast('Insira Usuário e Senha.')
