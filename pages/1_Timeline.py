@@ -17,7 +17,7 @@ with st.sidebar:
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 2rem;
+                    padding-top: 3rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
                     padding-right: 5rem;
@@ -27,6 +27,10 @@ st.markdown("""
         </style>
         
         """, unsafe_allow_html=True)
+
+# Check authentication state
+if 'authenticator' not in st.session_state:
+    st.switch_page('Estoque.py')
 
 # Layout
 if st.session_state['authentication_status']:
