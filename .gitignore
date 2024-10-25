@@ -2,3 +2,4 @@ secrets.toml
 *.bkp
 notes.md
 __pycache__/
+*.pbix

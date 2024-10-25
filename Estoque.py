@@ -20,7 +20,7 @@ st.sidebar.image(name_path, use_column_width=True)
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 1rem;
+                    padding-top: 3rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
                     padding-right: 5rem;
@@ -30,20 +30,6 @@ st.markdown("""
         </style>
         
         """, unsafe_allow_html=True)
-
-# Authentication
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
-
-authenticator = stauth.Authenticate(
-    config['credentials'],
-    config['cookie']['name'],
-    config['cookie']['key'],
-    config['cookie']['expiry_days']
-)
-
-# Login
-authenticator.login(clear_on_submit=True)
 
 # Bar plot
 def make_client_bar(x):
@@ -78,18 +64,12 @@ def make_status_pie(x):
     return fig
 
 # Layout
-if st.session_state['authentication_status']:
-    # Save authentication state
-    if 'authenticator' not in st.session_state:
-        st.session_state['authenticator'] = authenticator
+if "lorem" in st.query_params:
 
     # Date filter
     with st.sidebar:
         data_inicial = st.date_input(label="Data Inicial", value=datetime(2023, 1, 1))
         data_final = st.date_input(label="Data Final", value='today')
-    
-    # Logout
-    authenticator.logout(location='sidebar')
 
     # API Calls
     estq = utils.call_estoque()
@@ -131,7 +111,5 @@ if st.session_state['authentication_status']:
     # Row 2
     col_names = {'cliente':'Cliente', 'status': 'Status', 'mac': 'MAC', 'data': 'Data', 'devc_is_refurbished':'Remanufaturado?'}
     st.dataframe(estq_data[['cliente', 'status', 'mac', 'data', 'devc_is_refurbished']].rename(columns=col_names), height=280, use_container_width=True, hide_index=True)
-elif st.session_state['authentication_status'] is False:
-    st.toast('Usuário/Senha inválidos.')
-elif st.session_state['authentication_status'] is None:
-    st.toast('Insira Usuário e Senha.')
+else:
+    st.toast("Not authorized.")
