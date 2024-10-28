@@ -30,22 +30,21 @@ st.markdown("""
 
 # Check authentication state
 if 'authenticator' not in st.session_state:
-    st.switch_page('Estoque.py')
+    st.switch_page('Dashboard.py')
+if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
+    st.switch_page('Dashboard.py')
 
 # Layout
 if st.session_state['authentication_status']:
+
+    
+    tl_data = pd.read_csv('data/timeline.csv')
+    st.dataframe(tl_data, use_container_width=True, hide_index=True)
+
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
 
-    # API calls
-    exch = utils.call_exchange()
 
-    # Exchange data
-    exch_data = pd.DataFrame(exch.json()['result'])
-    exch_data['date'] = pd.to_datetime(exch_data['exch_ts_unix_timestamp'], unit='ms')
-
-    # Testing
-    st.markdown('## Teste Timeline')
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Estoque.py')
+    st.switch_page('Dashboard.py')
 

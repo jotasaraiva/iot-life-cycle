@@ -10,6 +10,19 @@ from datetime import datetime
 # Page config
 st.set_page_config(page_title="Treevia LC", layout="wide")
 
+with open('config.yaml') as file:
+    config = yaml.load(file, Loader=SafeLoader)
+
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days']
+)
+
+authenticator.login()
+st.session_state['authenticator'] = authenticator
+
 # Logo
 logo_path="assets/treevia-logo.png"
 name_path="assets/treevia-name.png"
@@ -20,7 +33,7 @@ st.sidebar.image(name_path, use_column_width=True)
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 3rem;
+                    padding-top: 1.5rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
                     padding-right: 5rem;
@@ -64,7 +77,7 @@ def make_status_pie(x):
     return fig
 
 # Layout
-if "lorem" in st.query_params:
+if st.session_state['authentication_status']:
 
     # Date filter
     with st.sidebar:
@@ -106,10 +119,12 @@ if "lorem" in st.query_params:
         estq_data_filter = estq_data if len(options) == 0 else estq_data.loc[estq_data['cliente'].isin(options)]
         st.plotly_chart(make_client_bar(estq_data_filter), use_container_width=True) 
     with col3:
-        st.plotly_chart(make_status_pie(estq_data), use_container_width=True)   
-    
+        st.plotly_chart(make_status_pie(estq_data), use_container_width=True)
     # Row 2
     col_names = {'cliente':'Cliente', 'status': 'Status', 'mac': 'MAC', 'data': 'Data', 'devc_is_refurbished':'Remanufaturado?'}
     st.dataframe(estq_data[['cliente', 'status', 'mac', 'data', 'devc_is_refurbished']].rename(columns=col_names), height=280, use_container_width=True, hide_index=True)
-else:
-    st.toast("Not authorized.")
+    authenticator.logout(location='sidebar')
+elif st.session_state['authentication_status'] == False:
+    st.toast('Username/password incorrect.')
+elif st.session_state['authentication_status'] == None:
+    st.toast('Enter user and password.')
