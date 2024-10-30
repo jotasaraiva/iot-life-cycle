@@ -22,7 +22,6 @@ def call_exchange():
     exch = rqs.get(st.secrets["exchange_url"])
     return exch
 
-
 def value_to_hex_color_g2r(value, max_value):
     if value < 0 or max_value <= 0 or value > max_value:
         raise ValueError("Value must be between 0 and max_value.")
@@ -148,6 +147,16 @@ def translate_clients(series):
 def check_series_match(series1, series2):
     return series1.isin(series2).all()
 
+def filter_dataframe(df, cliente=None, status=None):
+
+    if cliente is not None:
+        df = df[df['cliente'] == cliente]
+    
+    if status is not None:
+        df = df[df['status'] == status]
+
+    return df
+
 def update_or_add_rows(csv_file, key_column, update_data):
     """
     Updates rows in a DataFrame based on a key column or adds new rows if no match is found.
@@ -211,3 +220,7 @@ def append_to_csv(file_path, new_rows):
 
     # Write the updated DataFrame back to the CSV file
     updated_df.to_csv(file_path, index=False)
+
+def update_and_append(estoque_file, timeline_file, update_data, key):
+    update_or_add_rows(estoque_file, key, update_data)
+    append_to_csv(timeline_file, update_data)

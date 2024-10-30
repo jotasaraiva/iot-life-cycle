@@ -37,8 +37,8 @@ if st.session_state['authentication_status'] == False or st.session_state['authe
 # Layout
 if st.session_state['authentication_status']:
 
-    
     tl_data = pd.read_csv('data/timeline.csv')
+
     st.dataframe(tl_data, use_container_width=True, hide_index=True)
 
     # Logout

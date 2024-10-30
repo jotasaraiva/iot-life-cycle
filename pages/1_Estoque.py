@@ -137,9 +137,6 @@ if st.session_state['authentication_status']:
     if 'show_form' not in st.session_state:
         st.session_state['show_form'] = True
 
-    # Logout
-    st.session_state['authenticator'].logout(location='sidebar')
-
     # Layout  
     with st.popover('Cadastro de Estoque'):
         macs = st.text_area('MACs')
@@ -150,7 +147,7 @@ if st.session_state['authentication_status']:
             cliente = st.selectbox('Cliente', tuple(clientes))
             origem = None
         elif status == 'Estoque':
-            origem = st.selectbox('Origem', ('Fornecedor', 'Cliente'))
+            origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
             cliente = None
             if origem == 'Fornecedor':
                 lote_receb = st.text_input('Lote de Recebimento')
@@ -179,6 +176,19 @@ if st.session_state['authentication_status']:
         if new_data.shape[0] != 0:
             st.markdown('Preview')
             st.dataframe(new_data, use_container_width=True, hide_index=True)
-        st.button('Subir', on_click=utils.update_or_add_rows, args=['data/estoque.csv', 'macs', new_data],use_container_width=True, type='primary')
-    st.markdown('**Estoque cadastrado**')
-    st.dataframe(estq_data, use_container_width=True, hide_index=True, height=550)
+        st.button('Subir', on_click=utils.update_and_append, 
+                  args=['data/estoque.csv','data/timeline.csv', new_data,'macs'], 
+                  use_container_width=True, type='primary')
+        
+    # Filters
+    with st.sidebar:
+        flt_cliente = st.selectbox('Filtro de Clientes', tuple(clientes), index=None)
+        flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
+
+    filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)
+
+    # Table
+    st.dataframe(filtered, use_container_width=True, hide_index=True, height=550)
+
+    # Logout
+    st.session_state['authenticator'].logout(location='sidebar')
