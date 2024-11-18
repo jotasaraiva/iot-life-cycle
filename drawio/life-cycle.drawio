@@ -1,4 +1,4 @@
-<mxfile host="Electron" modified="2024-10-15T13:18:29.428Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="yOwvygNNzOAPMe1RR8jS" version="22.1.18" type="device" pages="2">
+<mxfile host="Electron" modified="2024-10-31T18:29:54.365Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.1.18 Chrome/120.0.6099.199 Electron/28.1.2 Safari/537.36" etag="rGMCaNLN2AkJihynysF6" version="22.1.18" type="device" pages="2">
   <diagram name="IOT LC" id="3x_UslZiVPVMY3ZtrIsC">
     <mxGraphModel dx="1050" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
@@ -269,14 +269,11 @@
         <mxCell id="skhl5sj7QXlaaDLRDzmE-3" value="corrigido?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="506.5" y="910" width="90" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="Obe1V6Qmc1MBH3mXQd-P-1" value="&lt;h1&gt;Ciclo de Vida do IoT&lt;/h1&gt;&lt;p&gt;Este fluxo representa o ciclo de vida real do dendrômetro IoT, demonstrando os devidos procedimentos técnicos aos quais o sensor será submetido durante sua operação.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="131.5" y="340" width="290" height="120" as="geometry" />
-        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
   <diagram id="MSzMNONgTMHsc9KmMskn" name="Status LC">
-    <mxGraphModel dx="1050" dy="629" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1235" dy="740" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -322,9 +319,6 @@
         </mxCell>
         <mxCell id="E66Hv-bTEziuQmRgQigx-6" value="Decisão" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="205" y="250" width="60" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="0-S_tOVUdDCyDbYiAfKV-1" value="&lt;h1&gt;Status do IoT&lt;/h1&gt;&lt;p&gt;Este fluxo representa as etapas no Ciclo de Vida do IoT no formato de &quot;compartimentos&quot; (&lt;i&gt;status&lt;/i&gt;) aos quais os sensores se enquadram durante sua jornada.&lt;/p&gt;" style="text;html=1;strokeColor=none;fillColor=none;spacing=5;spacingTop=-20;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
-          <mxGeometry x="490" y="40" width="310" height="120" as="geometry" />
         </mxCell>
         <mxCell id="Zc6fu7UcKQVEFPPojlvp-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="0-S_tOVUdDCyDbYiAfKV-2" target="SsWSHllx1lGKDQw3ln2h-1" edge="1">
           <mxGeometry relative="1" as="geometry" />
@@ -484,6 +478,9 @@
         <mxCell id="kDhb0QnMRIPkVsqCYB0z-17" value="Defeitos?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="114.25" y="410" width="90" height="60" as="geometry" />
         </mxCell>
+        <mxCell id="jSuiiXI01YXjIK21gZUB-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kDhb0QnMRIPkVsqCYB0z-22" target="jSuiiXI01YXjIK21gZUB-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="kDhb0QnMRIPkVsqCYB0z-22" value="Uso em Projeto" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="627" y="795" width="100" height="40" as="geometry" />
         </mxCell>
@@ -548,9 +545,9 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="kDhb0QnMRIPkVsqCYB0z-66" value="Mecânico" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="kDhb0QnMRIPkVsqCYB0z-61" vertex="1" connectable="0">
+        <mxCell id="kDhb0QnMRIPkVsqCYB0z-66" value="Mecânico/Eletrônico" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="kDhb0QnMRIPkVsqCYB0z-61" vertex="1" connectable="0">
           <mxGeometry x="0.1893" y="3" relative="1" as="geometry">
-            <mxPoint as="offset" />
+            <mxPoint x="-9" y="5" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="kDhb0QnMRIPkVsqCYB0z-64" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="kDhb0QnMRIPkVsqCYB0z-57" target="Zc6fu7UcKQVEFPPojlvp-6" edge="1">
@@ -570,9 +567,9 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="kDhb0QnMRIPkVsqCYB0z-67" value="Mecânico" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="kDhb0QnMRIPkVsqCYB0z-62" vertex="1" connectable="0">
+        <mxCell id="kDhb0QnMRIPkVsqCYB0z-67" value="Mecânico/Eletrônico" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="kDhb0QnMRIPkVsqCYB0z-62" vertex="1" connectable="0">
           <mxGeometry x="0.0935" y="-1" relative="1" as="geometry">
-            <mxPoint as="offset" />
+            <mxPoint x="7" y="9" as="offset" />
           </mxGeometry>
         </mxCell>
         <mxCell id="kDhb0QnMRIPkVsqCYB0z-63" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="kDhb0QnMRIPkVsqCYB0z-58" target="Zc6fu7UcKQVEFPPojlvp-6" edge="1">
@@ -611,6 +608,17 @@
         </mxCell>
         <mxCell id="kDhb0QnMRIPkVsqCYB0z-60" value="Correção" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="261.75" y="798.75" width="71.75" height="32.5" as="geometry" />
+        </mxCell>
+        <mxCell id="jSuiiXI01YXjIK21gZUB-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jSuiiXI01YXjIK21gZUB-1" target="SsWSHllx1lGKDQw3ln2h-1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="750" y="890" />
+              <mxPoint x="750" y="300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="jSuiiXI01YXjIK21gZUB-1" value="Desinstalação" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="627" y="870" width="100" height="40" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

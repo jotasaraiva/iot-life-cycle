@@ -41,7 +41,6 @@ st.markdown("""
                 button[title="View fullscreen"]{
                     visibility: hidden;}
         </style>
-        
         """, unsafe_allow_html=True)
 
 # Bar plot

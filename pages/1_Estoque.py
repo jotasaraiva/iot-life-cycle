@@ -188,7 +188,7 @@ if st.session_state['authentication_status']:
     filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)
 
     # Table
-    st.dataframe(filtered, use_container_width=True, hide_index=True, height=550)
+    st.dataframe(filtered, use_container_width=True, hide_index=True, height=600)
 
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')

@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
+import plotly.express as px
 from src import utils
 
 # Page config
@@ -24,8 +25,10 @@ st.markdown("""
                 }
                 button[title="View fullscreen"]{
                     visibility: hidden;}
+                [data-testid=column]:nth-of-type(1) [data-testid=stVerticalBlock]{
+                    gap: 0rem;
+                }
         </style>
-        
         """, unsafe_allow_html=True)
 
 # Check authentication state
@@ -38,12 +41,16 @@ if st.session_state['authentication_status'] == False or st.session_state['authe
 if st.session_state['authentication_status']:
 
     tl_data = pd.read_csv('data/timeline.csv')
+    tl_data_group = tl_data.groupby(['data', 'status']).size().reset_index(name='count')
 
-    st.dataframe(tl_data, use_container_width=True, hide_index=True)
+    bar = px.bar(tl_data_group, x='data', y='count', color='status', barmode='group', labels={'data': '', 'count': 'N° de Sensores', 'status': 'Status'})
+    bar.update_layout(height=350, margin=dict(l=40, r=40, t=20, b=20))
+
+    st.plotly_chart(bar, use_container_width=True)
+    st.dataframe(tl_data, use_container_width=True, hide_index=True, height=280)
 
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
-
 
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
     st.switch_page('Dashboard.py')
