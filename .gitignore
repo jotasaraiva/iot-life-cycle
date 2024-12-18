@@ -4,3 +4,5 @@ notes.md
 __pycache__/
 *.pbix
 treevia-conecta.md
+*.yaml
+hashing.py
