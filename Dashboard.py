@@ -1,7 +1,5 @@
 import streamlit as st
 import streamlit_authenticator as stauth
-import yaml
-from yaml.loader import SafeLoader
 import pandas as pd
 import plotly.express as px
 from src import utils
@@ -9,9 +7,6 @@ from datetime import datetime
 
 # Page config
 st.set_page_config(page_title="Treevia LC", layout="wide")
-
-with open('config.yaml') as file:
-    config = yaml.load(file, Loader=SafeLoader)
 
 authenticator = stauth.Authenticate(
     st.secrets['credentials'].to_dict(),
