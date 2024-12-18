@@ -6,3 +6,4 @@ __pycache__/
 treevia-conecta.md
 *.yaml
 hashing.py
+*-test.csv

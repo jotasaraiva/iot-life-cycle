@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 from src import utils
 from datetime import datetime
+from st_supabase_connection import SupabaseConnection, execute_query
 
 # Page config
 st.set_page_config(page_title="Treevia LC", layout="wide")
@@ -100,6 +101,11 @@ if st.session_state['authentication_status']:
     estq_val = estq_data.loc[estq_data['status'] == 'Estoque Treevia'].shape[0]
     prob_val = estq_data.loc[estq_data['status'].str.startswith('P')].shape[0]
     client_val = estq_data.loc[estq_data['status'] == 'Enviado para cliente'].shape[0]
+
+    #conn = st.connection("supabase", type=SupabaseConnection)
+    #rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
+    #sb_data = pd.DataFrame(rows.data)
+    #st.dataframe(sb_data)
 
     # Row 1
     col1, col2, col3 = st.columns((.20, .40, .40), gap="small")
