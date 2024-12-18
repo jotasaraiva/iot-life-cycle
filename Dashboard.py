@@ -22,7 +22,7 @@ st.session_state['authenticator'] = authenticator
 logo_path="assets/treevia-logo.png"
 name_path="assets/treevia-name.png"
 st.logo(logo_path)
-st.sidebar.image(name_path, use_column_width=True)
+st.sidebar.image(name_path, use_container_width=True)
 
 # Custom CSS
 st.markdown("""
