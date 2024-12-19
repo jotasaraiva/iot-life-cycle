@@ -173,8 +173,8 @@ def upsert_db(data, conn, db):
     st.toast(body=response)
 
 def update_sensores(data, conn):
-    update_db(data, conn, 'timeline')
     upsert_db(data, conn, 'estoque')
+    update_db(data, conn, 'timeline')
 
 
 # Global vars
@@ -264,4 +264,15 @@ clientes = [
     "Teste IFQ",
     "The Nature Conservancy",
     "Treevia Academy"
+]
+
+problemas = [
+    'Quarentena',
+    'Bateria',
+    'Mecânica',
+    'Não limpa memória',
+    'Não conecta na Jiga',
+    'Timeout',
+    'Não atualiza',
+    'Não faz dump'
 ]

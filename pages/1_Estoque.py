@@ -46,59 +46,65 @@ if st.session_state['authentication_status']:
     rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
     estq_data = pd.DataFrame(rows.data)
 
-    if 'show_form' not in st.session_state:
-        st.session_state['show_form'] = True
+    with st.sidebar:
+        flt_cliente = st.selectbox('Filtro de Clientes', tuple(utils.clientes), index=None)
+        flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
 
-    # Layout  
-    with st.popover('Cadastro de Estoque'):
-        macs = st.text_area('MACs')
-        nrows = len(macs.splitlines())
-        status = pd.Series([np.nan] * nrows)
-        cliente = pd.Series([np.nan] * nrows)
-        data = datetime.datetime.today().strftime('%Y-%m-%d')
-        origem = pd.Series([np.nan] * nrows)
-        lote_recebimento = pd.Series([np.nan] * nrows)
-        lote_treevia = pd.Series([np.nan] * nrows)
+    macs = st.text_area('MACs')
 
-        status = st.selectbox('Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
-        if status == 'Cliente':
-            cliente = st.selectbox('Cliente', tuple(utils.clientes))
-        elif status == 'Estoque':
-            origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
-            if origem == 'Fornecedor':
-                lote_receb = st.text_input('Lote de Recebimento')
-                lote_treevia = st.text_input('Lote Interno')
-        
+    nrows = len(macs.splitlines())
+    status = pd.Series([np.nan] * nrows)
+    cliente = pd.Series([np.nan] * nrows)
+    data = datetime.datetime.today().strftime('%Y-%m-%d')
+    origem = pd.Series([np.nan] * nrows)
+    lote_recebimento = pd.Series([np.nan] * nrows)
+    lote_treevia = pd.Series([np.nan] * nrows)
+    defeito = pd.Series([False] * nrows)
+    diag = pd.Series([np.nan] * nrows)
 
-        new_data = pd.DataFrame({
+    status = st.selectbox('Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
+    if status == 'Cliente':
+        cliente = st.selectbox('Cliente', tuple(utils.clientes))
+    elif status == 'Estoque':
+        origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
+        if origem == 'Fornecedor':
+            lote_receb = st.text_input('Lote de Recebimento')
+            lote_treevia = st.text_input('Lote Interno')
+        defeito = st.radio('Defeito', (True, False), index=1)
+        if defeito:
+            diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
+
+    new_data = pd.DataFrame({
             'macs': macs.splitlines(),
             'status': status,
             'cliente': cliente,
             'data': data,
             'origem': origem,
             'lote_recebimento': lote_recebimento,
-            'lote_treevia': lote_treevia
+            'lote_treevia': lote_treevia,
+            'defeito': defeito,
+            'diag': diag
         })
 
-        records = json.loads(new_data.to_json(orient='records', date_format='iso'))
+    records = json.loads(new_data.to_json(orient='records', date_format='iso'))
 
-        if new_data.shape[0] != 0:
-            st.markdown('Preview')
-            st.dataframe(new_data, use_container_width=True, hide_index=True)
+    if new_data.shape[0] != 0:
+        st.markdown('Preview')
+        st.dataframe(new_data, use_container_width=True, hide_index=True)
 
+    cols = st.columns((.2,.2,.6))
+
+    with cols[0]:
         st.button('Subir', on_click=utils.update_sensores, 
                   args=[records, conn], 
                   use_container_width=True, type='primary')
-        
-    # Filters
-    with st.sidebar:
-        flt_cliente = st.selectbox('Filtro de Clientes', tuple(utils.clientes), index=None)
-        flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
-
-    filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)
-
-    # Table
-    st.dataframe(filtered, use_container_width=True, hide_index=True, height=600)
+    with cols[2]:
+        with st.popover('Preview tabela', use_container_width=True):
+            filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)
+            st.dataframe(filtered, use_container_width=True, hide_index=True, height=600)
+    with cols[1]:
+        with st.popover('Preview JSON', use_container_width=True):
+            st.json(records)
 
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
