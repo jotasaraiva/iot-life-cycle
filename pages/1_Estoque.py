@@ -22,7 +22,7 @@ with st.sidebar:
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 3rem;
+                    padding-top: 2rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
                     padding-right: 5rem;
@@ -50,6 +50,7 @@ if st.session_state['authentication_status']:
         flt_cliente = st.selectbox('Filtro de Clientes', tuple(utils.clientes), index=None)
         flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
 
+    st.markdown('## Cadastro de Estoque')
     macs = st.text_area('MACs')
 
     nrows = len(macs.splitlines())
@@ -89,22 +90,14 @@ if st.session_state['authentication_status']:
     records = json.loads(new_data.to_json(orient='records', date_format='iso'))
 
     if new_data.shape[0] != 0:
-        st.markdown('Preview')
+        st.markdown('Preview dos dados')
         st.dataframe(new_data, use_container_width=True, hide_index=True)
 
-    cols = st.columns((.2,.2,.6))
-
+    cols = st.columns((.3,.3,.3))
     with cols[0]:
         st.button('Subir', on_click=utils.update_sensores, 
                   args=[records, conn], 
                   use_container_width=True, type='primary')
-    with cols[2]:
-        with st.popover('Preview tabela', use_container_width=True):
-            filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)
-            st.dataframe(filtered, use_container_width=True, hide_index=True, height=600)
-    with cols[1]:
-        with st.popover('Preview JSON', use_container_width=True):
-            st.json(records)
 
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
