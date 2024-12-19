@@ -3,7 +3,7 @@ import streamlit as st
 st.set_page_config(page_title="Treevia LC - Sobre")
 
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 
 # Logo
 logo_path="assets/treevia-logo.png"

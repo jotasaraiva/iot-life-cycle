@@ -3,6 +3,10 @@ import streamlit_authenticator as stauth
 import pandas as pd
 from src import utils
 import datetime
+import uuid
+import numpy as np
+import json
+from st_supabase_connection import SupabaseConnection, execute_query
 
 # Page config
 st.set_page_config(page_title="Treevia LC - Timeline", layout='wide')
@@ -29,110 +33,18 @@ st.markdown("""
         
         """, unsafe_allow_html=True)
 
-# Global vars
-clientes = [
-    "ELKS Engenharia Florestal e Ambiental Ltda",
-    "BRF",
-    "Bracell São Paulo",
-    "WorldTree",
-    "Suzano Inventário",
-    "SLB",
-    "CLIENTE TREINAMENTO",
-    "Treevia Consultoria",
-    "Klabin",
-    "Saint-Gobain",
-    "Melhoramentos Florestal",
-    "Agencia Florestal Ltda",
-    "CMPC",
-    "Bracell Bahia Florestal",
-    "Marques_Pro",
-    "Simasul Siderurgia",
-    "Desafio Cabruca",
-    "Placas do Brasil S.A",
-    "UNESP",
-    "TRC",
-    "Projeto UFT",
-    "High Precision",
-    "Gaia Agroflorestal",
-    "QA - Ambiente de Testes",
-    "Treevia Forest Technologies",
-    "Corus Agroflorestal",
-    "Teste Veracel",
-    "Forte Florestal",
-    "Veracel",
-    "Radix",
-    "demo_treevia",
-    "Grupo Mutum",
-    "Treevia - Equipe de Quality Analyst",
-    "Bracell",
-    "Remasa",
-    "G2 Forest",
-    "Inventec",
-    "KLINGELE PAPER NOVA CAMPINA LTDA",
-    "R.S FLORESTAL LTDA",
-    "Trial 2a Rotação",
-    "NORFLOR EMPREENDIMENTOS AGRÍCOLAS S/A",
-    "GELF SIDERURGIA S/A",
-    "ALJIBES AZULES S.A",
-    "Trail",
-    "SFDEMO2",
-    "PARCEL REFLORESTADORA LDTA",
-    "TTG Brasil Investimentos Florestais Ltda.",
-    "Suzano Papel e Celulose",
-    "Smart Forest Demo 2",
-    "High Precision Demo",
-    "3A Composites",
-    "Laminados AB",
-    "Projeto NANORAD'S",
-    "Floresta Assesoria e Planejamento Florestal LTDA",
-    "Farol Consultoria Agroflorestal",
-    "Madeireira Rio Claro",
-    "LIF - Land Inovation Fund",
-    "Taboão Reflorestamento SA",
-    "Colpar Participações",
-    "Agrobusiness Floresta e Pecuária",
-    "Cenibra",
-    "Unesp - Acadêmico",
-    "Google_PlayStore",
-    "Topo_Floresta",
-    "MANTENA FLORESTAL S.A.",
-    "FoxFlorestal",
-    "Treevia - Equipe de Desenvolvimento",
-    "Vallourec",
-    "Eldorado Brasil Celulose S/A",
-    "Eldorado Máxima Produtividade",
-    "Atenil S.A.",
-    "Teste Front 2.0 - Apagar EAGG",
-    "Test_Front 2.0",
-    "Treevia - Equipe de Data Analisys",
-    "Norflor Prognose Apresentacao",
-    "Thalis",
-    "Smart Forest Demo",
-    "Aldeir Testes Corporation",
-    "Brafor Projetos Ambientais Ltda",
-    " Eldorado Inventario Tradicional",
-    "Minasligas",
-    "PONTUAL BIOENERGIA LTDA",
-    "Teste IFQ",
-    "The Nature Conservancy",
-    "Treevia Academy"
-]
-
 # Check authentication state
 if 'authenticator' not in st.session_state:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
     
 # Layout
 if st.session_state['authentication_status']:
 
-    # API Calls
-    devc = utils.call_device()
-
-    # Data
-    devc_data = pd.DataFrame(devc.json()['result'])[['id','devc_cd_macaddress_treevia']]
-    estq_data = pd.read_csv("data/estoque.csv")
+    conn = st.connection("supabase", type=SupabaseConnection)
+    rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
+    estq_data = pd.DataFrame(rows.data)
 
     if 'show_form' not in st.session_state:
         st.session_state['show_form'] = True
@@ -140,49 +52,47 @@ if st.session_state['authentication_status']:
     # Layout  
     with st.popover('Cadastro de Estoque'):
         macs = st.text_area('MACs')
+        nrows = len(macs.splitlines())
+        status = pd.Series([np.nan] * nrows)
+        cliente = pd.Series([np.nan] * nrows)
+        data = datetime.datetime.today().strftime('%Y-%m-%d')
+        origem = pd.Series([np.nan] * nrows)
+        lote_recebimento = pd.Series([np.nan] * nrows)
+        lote_treevia = pd.Series([np.nan] * nrows)
+
         status = st.selectbox('Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
-        lote_receb = None
-        lote_treevia = None
         if status == 'Cliente':
-            cliente = st.selectbox('Cliente', tuple(clientes))
-            origem = None
+            cliente = st.selectbox('Cliente', tuple(utils.clientes))
         elif status == 'Estoque':
             origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
-            cliente = None
             if origem == 'Fornecedor':
                 lote_receb = st.text_input('Lote de Recebimento')
                 lote_treevia = st.text_input('Lote Interno')
-        else:
-            cliente = None
-            origem = None
-        if origem == 'Fornecedor':
-            new_data = pd.DataFrame({
-                'macs': macs.splitlines(),
-                'status': status,
-                'cliente': cliente,
-                'origem': origem,
-                'lote_recebimento': lote_receb,
-                'lote_treevia': lote_treevia,
-                'data': datetime.datetime.today().date()
-            })
-        else:
-            new_data = pd.DataFrame({
-                'macs': macs.splitlines(),
-                'status': status,
-                'cliente': cliente,
-                'origem': origem,
-                'data': datetime.datetime.today().date()
-            })
+        
+
+        new_data = pd.DataFrame({
+            'macs': macs.splitlines(),
+            'status': status,
+            'cliente': cliente,
+            'data': data,
+            'origem': origem,
+            'lote_recebimento': lote_recebimento,
+            'lote_treevia': lote_treevia
+        })
+
+        records = json.loads(new_data.to_json(orient='records', date_format='iso'))
+
         if new_data.shape[0] != 0:
             st.markdown('Preview')
             st.dataframe(new_data, use_container_width=True, hide_index=True)
-        st.button('Subir', on_click=utils.update_and_append, 
-                  args=['data/estoque.csv','data/timeline.csv', new_data,'macs'], 
+
+        st.button('Subir', on_click=utils.update_sensores, 
+                  args=[records, conn], 
                   use_container_width=True, type='primary')
         
     # Filters
     with st.sidebar:
-        flt_cliente = st.selectbox('Filtro de Clientes', tuple(clientes), index=None)
+        flt_cliente = st.selectbox('Filtro de Clientes', tuple(utils.clientes), index=None)
         flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
 
     filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)

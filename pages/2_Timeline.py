@@ -33,9 +33,9 @@ st.markdown("""
 
 # Check authentication state
 if 'authenticator' not in st.session_state:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 
 # Layout
 if st.session_state['authentication_status']:
@@ -53,5 +53,5 @@ if st.session_state['authentication_status']:
     st.session_state['authenticator'].logout(location='sidebar')
 
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 

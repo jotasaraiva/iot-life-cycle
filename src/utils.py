@@ -1,6 +1,7 @@
 import streamlit as st
 import requests as rqs
 import pandas as pd
+from st_supabase_connection import SupabaseConnection, execute_query
 
 @st.cache_data(show_spinner="Carregando Estoque...")
 def call_estoque():
@@ -157,70 +158,110 @@ def filter_dataframe(df, cliente=None, status=None):
 
     return df
 
-def update_or_add_rows(csv_file, key_column, update_data):
-    """
-    Updates rows in a DataFrame based on a key column or adds new rows if no match is found.
+def update_db(data, conn, db):
+    response = execute_query(
+        conn.table(db).insert(data), ttl=0
+    )
 
-    Parameters:
-    csv_file (str): Path to the CSV file.
-    key_column (str): The column to match on.
-    update_data (pd.DataFrame): A DataFrame containing the columns and their new values.
+    st.toast(body=response)
 
-    Returns:
-    pd.DataFrame: The updated DataFrame.
-    """
-    # Load the CSV file into a DataFrame
-    df = pd.read_csv(csv_file)
+def upsert_db(data, conn, db):
+    response = execute_query(
+        conn.table(db).upsert(data, on_conflict=['macs'])
+    )
 
-    # Check if the key_column exists in the DataFrame
-    if key_column not in df.columns:
-        raise ValueError(f"{key_column} not found in the DataFrame.")
-    
-    # List to hold rows to be added
-    rows_to_add = []
+    st.toast(body=response)
 
-    # Iterate over each row in the update_data DataFrame
-    for _, row in update_data.iterrows():
-        key_value = row[key_column]
-        
-        # Update the row if the key exists
-        if key_value in df[key_column].values:
-            df.loc[df[key_column] == key_value, row.index] = row.values
-        else:
-            # If key doesn't exist, prepare to add a new row
-            rows_to_add.append(row)
+def update_sensores(data, conn):
+    update_db(data, conn, 'timeline')
+    upsert_db(data, conn, 'estoque')
 
-    # If there are rows to add, concatenate them to the original DataFrame
-    if rows_to_add:
-        new_rows_df = pd.DataFrame(rows_to_add)
-        df = pd.concat([df, new_rows_df], ignore_index=True)
 
-    # Save the updated DataFrame back to the CSV
-    df.to_csv(csv_file, index=False)
-
-def append_to_csv(file_path, new_rows):
-    """
-    Append new rows to a CSV file, ensuring only existing columns are used.
-
-    Parameters:
-    - file_path: str, path to the CSV file
-    - new_rows: list of dicts, each dict represents a new row to append
-    """
-    # Read the existing CSV file into a DataFrame
-    df = pd.read_csv(file_path)
-
-    # Create a DataFrame for the new rows
-    new_df = pd.DataFrame(new_rows)
-
-    # Retain only the columns that exist in the original DataFrame
-    new_df = new_df[df.columns.intersection(new_df.columns)]
-
-    # Append the new rows to the original DataFrame
-    updated_df = pd.concat([df, new_df], ignore_index=True)
-
-    # Write the updated DataFrame back to the CSV file
-    updated_df.to_csv(file_path, index=False)
-
-def update_and_append(estoque_file, timeline_file, update_data, key):
-    update_or_add_rows(estoque_file, key, update_data)
-    append_to_csv(timeline_file, update_data)
+# Global vars
+clientes = [
+    "ELKS Engenharia Florestal e Ambiental Ltda",
+    "BRF",
+    "Bracell São Paulo",
+    "WorldTree",
+    "Suzano Inventário",
+    "SLB",
+    "CLIENTE TREINAMENTO",
+    "Treevia Consultoria",
+    "Klabin",
+    "Saint-Gobain",
+    "Melhoramentos Florestal",
+    "Agencia Florestal Ltda",
+    "CMPC",
+    "Bracell Bahia Florestal",
+    "Marques_Pro",
+    "Simasul Siderurgia",
+    "Desafio Cabruca",
+    "Placas do Brasil S.A",
+    "UNESP",
+    "TRC",
+    "Projeto UFT",
+    "High Precision",
+    "Gaia Agroflorestal",
+    "QA - Ambiente de Testes",
+    "Treevia Forest Technologies",
+    "Corus Agroflorestal",
+    "Teste Veracel",
+    "Forte Florestal",
+    "Veracel",
+    "Radix",
+    "demo_treevia",
+    "Grupo Mutum",
+    "Treevia - Equipe de Quality Analyst",
+    "Bracell",
+    "Remasa",
+    "G2 Forest",
+    "Inventec",
+    "KLINGELE PAPER NOVA CAMPINA LTDA",
+    "R.S FLORESTAL LTDA",
+    "Trial 2a Rotação",
+    "NORFLOR EMPREENDIMENTOS AGRÍCOLAS S/A",
+    "GELF SIDERURGIA S/A",
+    "ALJIBES AZULES S.A",
+    "Trail",
+    "SFDEMO2",
+    "PARCEL REFLORESTADORA LDTA",
+    "TTG Brasil Investimentos Florestais Ltda.",
+    "Suzano Papel e Celulose",
+    "Smart Forest Demo 2",
+    "High Precision Demo",
+    "3A Composites",
+    "Laminados AB",
+    "Projeto NANORAD'S",
+    "Floresta Assesoria e Planejamento Florestal LTDA",
+    "Farol Consultoria Agroflorestal",
+    "Madeireira Rio Claro",
+    "LIF - Land Inovation Fund",
+    "Taboão Reflorestamento SA",
+    "Colpar Participações",
+    "Agrobusiness Floresta e Pecuária",
+    "Cenibra",
+    "Unesp - Acadêmico",
+    "Google_PlayStore",
+    "Topo_Floresta",
+    "MANTENA FLORESTAL S.A.",
+    "FoxFlorestal",
+    "Treevia - Equipe de Desenvolvimento",
+    "Vallourec",
+    "Eldorado Brasil Celulose S/A",
+    "Eldorado Máxima Produtividade",
+    "Atenil S.A.",
+    "Teste Front 2.0 - Apagar EAGG",
+    "Test_Front 2.0",
+    "Treevia - Equipe de Data Analisys",
+    "Norflor Prognose Apresentacao",
+    "Thalis",
+    "Smart Forest Demo",
+    "Aldeir Testes Corporation",
+    "Brafor Projetos Ambientais Ltda",
+    " Eldorado Inventario Tradicional",
+    "Minasligas",
+    "PONTUAL BIOENERGIA LTDA",
+    "Teste IFQ",
+    "The Nature Conservancy",
+    "Treevia Academy"
+]
