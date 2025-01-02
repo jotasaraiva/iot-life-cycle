@@ -177,6 +177,10 @@ def update_sensores(data, conn):
     update_db(data, conn, 'timeline')
 
 
+def format_bool(x):
+    res = 'Sim' if x == True else 'Não'
+    return res
+
 # Global vars
 clientes = [
     "ELKS Engenharia Florestal e Ambiental Ltda",

@@ -22,7 +22,7 @@ with st.sidebar:
 st.markdown("""
         <style>
                .block-container {
-                    padding-top: 2rem;
+                    padding-top: 3rem;
                     padding-bottom: 0rem;
                     padding-left: 5rem;
                     padding-right: 5rem;
@@ -71,7 +71,7 @@ if st.session_state['authentication_status']:
         if origem == 'Fornecedor':
             lote_receb = st.text_input('Lote de Recebimento')
             lote_treevia = st.text_input('Lote Interno')
-        defeito = st.radio('Defeito', (True, False), index=1)
+        defeito = st.radio('Defeito', (True, False), index=1, format_func=utils.format_bool)
         if defeito:
             diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
 
