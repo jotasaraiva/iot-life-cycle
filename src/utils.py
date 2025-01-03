@@ -176,7 +176,6 @@ def update_sensores(data, conn):
     upsert_db(data, conn, 'estoque')
     update_db(data, conn, 'timeline')
 
-
 def format_bool(x):
     res = 'Sim' if x == True else 'Não'
     return res

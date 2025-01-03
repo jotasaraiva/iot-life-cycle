@@ -54,26 +54,53 @@ if st.session_state['authentication_status']:
     macs = st.text_area('MACs')
 
     nrows = len(macs.splitlines())
-    status = pd.Series([np.nan] * nrows)
-    cliente = pd.Series([np.nan] * nrows)
     data = datetime.datetime.today().strftime('%Y-%m-%d')
-    origem = pd.Series([np.nan] * nrows)
-    lote_recebimento = pd.Series([np.nan] * nrows)
-    lote_treevia = pd.Series([np.nan] * nrows)
-    defeito = pd.Series([False] * nrows)
-    diag = pd.Series([np.nan] * nrows)
+    disable_button = True
 
-    status = st.selectbox('Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
+    # formulário de cadastro de estoque
+    status = st.selectbox('Status', ('Cliente', 'Estoque','Remanufatura'), index=1)
     if status == 'Cliente':
         cliente = st.selectbox('Cliente', tuple(utils.clientes))
+        defeito = False
     elif status == 'Estoque':
         origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
         if origem == 'Fornecedor':
-            lote_receb = st.text_input('Lote de Recebimento')
+            lote_recebimento = st.text_input('Lote de Recebimento')
             lote_treevia = st.text_input('Lote Interno')
         defeito = st.radio('Defeito', (True, False), index=1, format_func=utils.format_bool)
         if defeito:
             diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
+    elif status == 'Remanufatura':
+        defeito = False
+
+    def make_exist(vars):
+        for var in vars:
+            if var not in globals() or globals()[var] == '':
+                globals()[var] = None
+
+    make_exist(['cliente', 'lote_recebimento', 'lote_treevia', 'origem', 'diag'])
+
+    # validação de dados do formulário
+    if macs != '':
+        if status == 'Cliente':
+            if cliente != '':
+                disable_button = False
+        if status == 'Estoque':
+            if origem == 'Fornecedor':
+                if lote_recebimento != None and lote_treevia != None:
+                    if defeito:
+                        if diag != None:
+                            disable_button = False
+                    elif not defeito:
+                        disable_button = False
+            if origem == 'Cliente':
+                if defeito:
+                        if diag != None:
+                            disable_button = False
+                elif not defeito:
+                    disable_button = False
+        if status == 'Remanufatura':
+            disable_button = False
 
     new_data = pd.DataFrame({
             'macs': macs.splitlines(),
@@ -86,17 +113,15 @@ if st.session_state['authentication_status']:
             'defeito': defeito,
             'diag': diag
         })
-
     records = json.loads(new_data.to_json(orient='records', date_format='iso'))
-
     if new_data.shape[0] != 0:
         st.markdown('Preview dos dados')
         st.dataframe(new_data, use_container_width=True, hide_index=True)
 
     cols = st.columns((.3,.3,.3))
-    with cols[0]:
+    with cols[1]:
         st.button('Subir', on_click=utils.update_sensores, 
-                  args=[records, conn], 
+                  args=[records, conn], disabled=disable_button,
                   use_container_width=True, type='primary')
 
     # Logout
