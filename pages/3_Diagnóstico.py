@@ -3,6 +3,7 @@ import streamlit_authenticator as stauth
 import pandas as pd
 from src import utils
 from st_supabase_connection import SupabaseConnection, execute_query
+import pathlib
 
 st.set_page_config(page_title="Treevia LC - Diagnóstico")
 
@@ -16,20 +17,12 @@ st.logo(logo_path)
 with st.sidebar:
     st.image(name_path)
 
-# Custom CSS
-st.markdown("""
-        <style>
-               .block-container {
-                    padding-top: 3rem;
-                    padding-bottom: 0rem;
-                    padding-left: 5rem;
-                    padding-right: 5rem;
-                }
-                button[title="View fullscreen"]{
-                    visibility: hidden;}
-        </style>
-        
-        """, unsafe_allow_html=True)
+# CSS config
+def load_css(file_path):
+    with open(file_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+css_path = pathlib.Path(__file__).parents[1] / "assets" / "styles.css"
+load_css(css_path)
 
 # Check authentication state
 if 'authenticator' not in st.session_state:
