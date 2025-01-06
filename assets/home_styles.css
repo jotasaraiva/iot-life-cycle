@@ -5,7 +5,7 @@
 }
 
 .block-container {
-    padding-top: 1.5rem;
+    padding-top: 1rem;
     padding-bottom: 0rem;
     padding-left: 5rem;
     padding-right: 5rem;
@@ -16,8 +16,13 @@
 }
 
 div.stMetric {
-    border: 1px solid var(--azul);
-    border-radius: 20px;
+    border-radius: 10px;
     background-color: var(--cinza);
     padding: 10px;
+}
+
+.stColumn {
+    background-color: whitesmoke;
+    padding: 10px;
+    border-radius: 10px;
 }

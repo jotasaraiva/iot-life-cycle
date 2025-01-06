@@ -7,3 +7,4 @@ treevia-conecta.md
 *.yaml
 hashing.py
 *-test.csv
+requirements.txt

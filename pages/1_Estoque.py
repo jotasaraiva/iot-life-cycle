@@ -23,7 +23,7 @@ with st.sidebar:
 def load_css(file_path):
     with open(file_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-css_path = pathlib.Path(__file__).parents[1] / "assets" / "styles.css"
+css_path = pathlib.Path(__file__).parents[1] / "assets" / "stock_styles.css"
 load_css(css_path)
 
 # Check authentication state
@@ -47,7 +47,7 @@ if st.session_state['authentication_status']:
     disable_button = True
 
     # formulário de cadastro de estoque
-    status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default='Cliente',   )
+    status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default=None)
     if status == 'Cliente':
         cliente = st.selectbox('Cliente', tuple(utils.clientes))
         defeito = False

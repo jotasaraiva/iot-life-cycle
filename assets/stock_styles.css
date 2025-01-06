@@ -1,0 +1,22 @@
+:root {
+    --verde: #92bb49;
+    --cinza: #e6e6e6;
+    --azul: #081f44;
+}
+
+.block-container {
+    padding-top: 2rem;
+    padding-bottom: 0rem;
+    padding-left: 5rem;
+    padding-right: 5rem;
+}
+
+.stSidebar .stElementToolbar {
+    visibility: hidden;
+}
+
+div.stMetric {
+    border-radius: 10px;
+    background-color: var(--cinza);
+    padding: 10px;
+}
