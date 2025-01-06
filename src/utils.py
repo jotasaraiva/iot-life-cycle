@@ -1,6 +1,7 @@
 import streamlit as st
 import requests as rqs
 import pandas as pd
+import plotly.graph_objects as go
 from st_supabase_connection import SupabaseConnection, execute_query
 
 @st.cache_data(show_spinner="Carregando Estoque...")
@@ -22,36 +23,6 @@ def call_hw():
 def call_exchange():
     exch = rqs.get(st.secrets["exchange_url"])
     return exch
-
-def value_to_hex_color_g2r(value, max_value):
-    if value < 0 or max_value <= 0 or value > max_value:
-        raise ValueError("Value must be between 0 and max_value.")
-
-    # Calculate the ratio of the value to the max value
-    ratio = value / max_value
-
-    # Calculate RGB values
-    red = int(255 * ratio)  # red increases as the value increases
-    green = int(255 * (1 - ratio))  # green decreases as the value increases
-
-    # Construct the hex color
-    hex_color = f'#{red:02X}{green:02X}00'
-    return hex_color
-
-def value_to_hex_color_r2g(value, max_value):
-    if value < 0 or max_value <= 0 or value > max_value:
-        raise ValueError("Value must be between 0 and max_value.")
-
-    # Calculate the ratio of the value to the max value
-    ratio = value / max_value
-
-    # Calculate RGB values
-    red = int(255 * ratio)  # red increases as the value increases
-    green = int(255 * (1 - ratio))  # green decreases as the value increases
-
-    # Construct the hex color
-    hex_color = f'#{green:02X}{red:02X}00'
-    return hex_color
 
 def translate_clients(series):
     translation_dict = {
@@ -179,6 +150,21 @@ def update_sensores(data, conn):
 def format_bool(x):
     res = 'Sim' if x == True else 'Não'
     return res
+
+def pie_plotly(data, name, value, title, height):
+    pie = go.Figure(data=[go.Pie(
+            labels=data[name], 
+            values=data[value],
+            showlegend=False,
+            hole=.3)]) 
+    
+    pie.update_layout( 
+        height=height,
+        margin=dict(t=25, b=0, l=0, r=0),
+        title=dict(text=title),
+        paper_bgcolor='rgba(0,0,0,0)')
+    
+    return pie
 
 # Global vars
 clientes = [

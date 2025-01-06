@@ -70,29 +70,13 @@ if st.session_state['authentication_status']:
         )
     with cols1[2]:
         status_pie_data = estq_data.groupby(['status']).size().reset_index(name='counts')
-        status_pie = go.Figure(data=[go.Pie(
-            labels=status_pie_data.status, 
-            values=status_pie_data.counts,
-            showlegend=False)])
-        status_pie.update_layout(
-            height=150,
-            margin=dict(t=25, b=0, l=0, r=0),
-            title=dict(text='Status'),
-            paper_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(status_pie)
+        status_pie = utils.pie_plotly(status_pie_data, 'status', 'counts', 'Status', 140)
+        st.plotly_chart(status_pie, use_container_width=True)
 
         defeito_pie_data = estq_data.groupby(['defeito']).size().reset_index(name='counts')
         defeito_pie_data['defeito'] = defeito_pie_data['defeito'].replace({True: 'Defeituosos', False: 'Saudáveis'})
-        defeito_pie = go.Figure(data=[go.Pie(
-            labels=defeito_pie_data.defeito, 
-            values=defeito_pie_data.counts,
-            showlegend=False)])
-        defeito_pie.update_layout(
-            height=150, 
-            margin=dict(t=25, b=0, l=0, r=0),
-            title=dict(text='Defeituosos'),
-            paper_bgcolor='rgba(0,0,0,0)')
-        st.plotly_chart(defeito_pie)
+        defeito_pie = utils.pie_plotly(defeito_pie_data, 'defeito', 'counts', 'Defeituosos', 140)
+        st.plotly_chart(defeito_pie, use_container_width=True)
     with cols1[3]:
         bars_data = estq_data.groupby(['cliente']).size().reset_index(name='counts')
         bars = px.bar(bars_data, x='counts', y='cliente', orientation='h')
@@ -106,7 +90,16 @@ if st.session_state['authentication_status']:
 
     cols2 = st.columns(2)
     with cols2[0]:
-        st.dataframe(estq_data, height=250, hide_index=True)
+        st.dataframe(estq_data, height=250, hide_index=True, use_container_width=True)
+    with cols2[1]:
+        choice = st.selectbox('Procurar sensor', estq_data.macs, index=0, placeholder='MAC')
+        if choice != None:
+            filtered = estq_data[estq_data['macs'] == choice]
+            st.markdown(f"Status: {filtered['status'].to_list()[0]}")
+            st.markdown(f"Data de Cadastro: {filtered['data'].to_list()[0]}")
+            st.markdown(f"Lote de Recebimento: {filtered['lote_recebimento'].to_list()[0]}")
+            st.markdown(f"Lote Treevia: {filtered['lote_treevia'].to_list()[0]}")
+                
 
     authenticator.logout(location='sidebar')
 
