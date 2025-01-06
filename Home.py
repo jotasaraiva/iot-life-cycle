@@ -1,7 +1,8 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
-import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 from src import utils
 from datetime import datetime
 from st_supabase_connection import SupabaseConnection, execute_query
@@ -71,14 +72,27 @@ if st.session_state['authentication_status']:
             )
 
     with cols[2]:
+        
         status_pie_data = estq_data.groupby(['status']).size().reset_index(name='counts')
-        status_pie = px.pie(status_pie_data, values='counts', names='status', hole=.3)
-        status_pie.update_layout(height=150, width=200)
+        status_pie = go.Figure(data=[go.Pie(
+            labels=status_pie_data.status, 
+            values=status_pie_data.counts,
+            showlegend=False)])
+        status_pie.update_layout(
+            height=150,
+            margin=dict(t=25, b=0, l=0, r=0),
+            title=dict(text='Status'))
         st.plotly_chart(status_pie)
 
         diag_pie_data = estq_data.groupby(['diag']).size().reset_index(name='counts')
-        diag_pie = px.pie(diag_pie_data, values='counts', names='diag', hole=.3)
-        diag_pie.update_layout(height=150, width=200)
+        diag_pie = go.Figure(data=[go.Pie(
+            labels=diag_pie_data.diag, 
+            values=diag_pie_data.counts,
+            showlegend=False)])
+        diag_pie.update_layout(
+            height=150, 
+            margin=dict(t=25, b=0, l=0, r=0),
+            title=dict(text='Diagnóstico'))
         st.plotly_chart(diag_pie)
 
     st.dataframe(estq_data, use_container_width=True, hide_index=True)
