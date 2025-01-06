@@ -1,9 +1,23 @@
+:root {
+    --verde: #92bb49;
+    --cinza: #e6e6e6;
+    --azul: #081f44;
+}
+
 .block-container {
-    padding-top: 3rem;
+    padding-top: 1.5rem;
     padding-bottom: 0rem;
     padding-left: 5rem;
     padding-right: 5rem;
 }
 
-button[title="View fullscreen"]{
-    visibility: hidden;}
+.stSidebar .stElementToolbar {
+    visibility: hidden;
+}
+
+div.stMetric {
+    border: 1px solid var(--azul);
+    border-radius: 20px;
+    background-color: var(--cinza);
+    padding: 10px;
+}

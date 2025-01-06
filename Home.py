@@ -39,48 +39,47 @@ if st.session_state['authentication_status']:
     conn = st.connection("supabase", type=SupabaseConnection)
     rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
     estq_data = pd.DataFrame(rows.data)
-    cols = st.columns((.4, .3, .3))
+    cols = st.columns((.45, .25, .25))
     
     with cols[0]:
         metric_cols = st.columns(2)
         with metric_cols[0]:
             st.metric(
-                'Sensores em Estoque', 
-                estq_data.groupby(['status']).size()['Estoque'],
-                border=True
+                'IoTs em Estoque', 
+                estq_data.groupby(['status']).size()['Estoque']
             )
             st.metric(
-                'Sensores saudáveis',
-                len(estq_data.loc[(estq_data['defeito'] == False) & (estq_data['status'] == 'Estoque')]),
-                border=True
+                'IoTs saudáveis',
+                len(estq_data.loc[(estq_data['defeito'] == False) & (estq_data['status'] == 'Estoque')])
             )
             st.metric(
-                'Sensores defeituosos',
-                len(estq_data.loc[(estq_data['defeito'] == True) & (estq_data['status'] == 'Estoque')]),
-                border=True
+                'IoTs defeituosos',
+                len(estq_data.loc[(estq_data['defeito'] == True) & (estq_data['status'] == 'Estoque')])
             )
         with metric_cols[1]:
             st.metric(
-                'Sensores em Remanufatura',
-                len(estq_data.loc[estq_data['status'] == 'Remanufatura']),
-                border=True
+                'IoTs em Remanufatura',
+                len(estq_data.loc[estq_data['status'] == 'Remanufatura'])
             )
             st.metric(
-                'Sensores em Cliente',
-                len(estq_data.loc[estq_data['status'] == 'Cliente']),
-                border=True
+                'IoTs em Cliente',
+                len(estq_data.loc[estq_data['status'] == 'Cliente'])
             )
             st.metric(
-                'Sensores totais',
-                len(estq_data),
-                border=True
+                'IoTs totais',
+                len(estq_data)
             )
 
     with cols[2]:
-        pie_data = estq_data.groupby(['status']).size().reset_index(name='counts')
-        fig = px.pie(pie_data, values='counts', names='status', hole=.5)
-        fig.update_layout(height=150, margin=dict(l=10, r=10, t=10, b=10))
-        st.plotly_chart(fig)
+        status_pie_data = estq_data.groupby(['status']).size().reset_index(name='counts')
+        status_pie = px.pie(status_pie_data, values='counts', names='status', hole=.3)
+        status_pie.update_layout(height=150, width=200)
+        st.plotly_chart(status_pie)
+
+        diag_pie_data = estq_data.groupby(['diag']).size().reset_index(name='counts')
+        diag_pie = px.pie(diag_pie_data, values='counts', names='diag', hole=.3)
+        diag_pie.update_layout(height=150, width=200)
+        st.plotly_chart(diag_pie)
 
     st.dataframe(estq_data, use_container_width=True, hide_index=True)
 

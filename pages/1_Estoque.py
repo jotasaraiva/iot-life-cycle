@@ -39,10 +39,6 @@ if st.session_state['authentication_status']:
     rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
     estq_data = pd.DataFrame(rows.data)
 
-    with st.sidebar:
-        flt_cliente = st.selectbox('Filtro de Clientes', tuple(utils.clientes), index=None)
-        flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
-
     st.markdown('## Cadastro de Estoque')
     macs = st.text_area('MACs')
 
@@ -51,7 +47,7 @@ if st.session_state['authentication_status']:
     disable_button = True
 
     # formulário de cadastro de estoque
-    status = st.selectbox('Status', ('Cliente', 'Estoque','Remanufatura'), index=1)
+    status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default='Cliente',   )
     if status == 'Cliente':
         cliente = st.selectbox('Cliente', tuple(utils.clientes))
         defeito = False
@@ -64,6 +60,8 @@ if st.session_state['authentication_status']:
         if defeito:
             diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
     elif status == 'Remanufatura':
+        defeito = False
+    elif status == None:
         defeito = False
 
     def make_exist(vars):
@@ -110,7 +108,7 @@ if st.session_state['authentication_status']:
     if new_data.shape[0] != 0:
         st.markdown('Preview dos dados')
         st.dataframe(new_data, use_container_width=True, hide_index=True)
-
+    
     cols = st.columns((.3,.3,.3))
     with cols[1]:
         st.button('Subir', on_click=utils.update_sensores, 
