@@ -21,7 +21,7 @@ with st.sidebar:
 def load_css(file_path):
     with open(file_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-css_path = pathlib.Path(__file__).parents[1] / "assets" / "styles.css"
+css_path = pathlib.Path(__file__).parents[1] / "assets" / "stock_styles.css"
 load_css(css_path)
 
 # Check authentication state

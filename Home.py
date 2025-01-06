@@ -45,7 +45,7 @@ if st.session_state['authentication_status']:
     with cols1[0]:
         st.metric(
             'IoTs em Estoque', 
-            estq_data.groupby(['status']).size()['Estoque']
+            len(estq_data[estq_data['status'] == 'Estoque'])
         )
         st.metric(
             'IoTs saudáveis',
@@ -88,19 +88,7 @@ if st.session_state['authentication_status']:
             plot_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(bars, use_container_width=True)
 
-    cols2 = st.columns(2)
-    with cols2[0]:
-        st.dataframe(estq_data, height=250, hide_index=True, use_container_width=True)
-    with cols2[1]:
-        choice = st.selectbox('Procurar sensor', estq_data.macs, index=0, placeholder='MAC')
-        if choice != None:
-            filtered = estq_data[estq_data['macs'] == choice]
-            st.markdown(f"Status: {filtered['status'].to_list()[0]}")
-            st.markdown(f"Data de Cadastro: {filtered['data'].to_list()[0]}")
-            st.markdown(f"Lote de Recebimento: {filtered['lote_recebimento'].to_list()[0]}")
-            st.markdown(f"Lote Treevia: {filtered['lote_treevia'].to_list()[0]}")
-                
-
+    st.dataframe(estq_data, height=210, hide_index=True, use_container_width=True)      
     authenticator.logout(location='sidebar')
 
 elif st.session_state['authentication_status'] == False:

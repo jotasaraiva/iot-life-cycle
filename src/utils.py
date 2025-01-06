@@ -166,6 +166,14 @@ def pie_plotly(data, name, value, title, height):
     
     return pie
 
+def get_last_values_by_date(df, match_column, match_value, target_column, date_column):
+
+    filter_df = df[df[match_column] == match_value]
+    sort_df = filter_df.sort_values(by=date_column, ascending=True)
+    last_values = sort_df[target_column].iloc[-1]
+    
+    return last_values
+
 # Global vars
 clientes = [
     "ELKS Engenharia Florestal e Ambiental Ltda",

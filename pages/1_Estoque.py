@@ -36,14 +36,16 @@ if st.session_state['authentication_status'] == False or st.session_state['authe
 if st.session_state['authentication_status']:
 
     conn = st.connection("supabase", type=SupabaseConnection)
-    rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
-    estq_data = pd.DataFrame(rows.data)
+    estq_rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
+    estq_data = pd.DataFrame(estq_rows.data)
+    tl_rows = execute_query(conn.table('timeline').select("*"), ttl="5m")
+    tl_data = pd.DataFrame(tl_rows.data)
 
     st.markdown('## Cadastro de Estoque')
     macs = st.text_area('MACs')
+    data = st.date_input('Data', format='DD/MM/YYYY')
 
     nrows = len(macs.splitlines())
-    data = datetime.datetime.today().strftime('%Y-%m-%d')
     disable_button = True
 
     # formulário de cadastro de estoque
@@ -104,6 +106,17 @@ if st.session_state['authentication_status']:
             'defeito': defeito,
             'diag': diag
         })
+    
+    if status in ('Remanufatura', 'Cliente'):
+        new_data['lote_recebimento'] = list([
+            utils.get_last_values_by_date(tl_data, 'macs', mac, 'lote_recebimento', 'data')
+            for mac in macs.splitlines()
+        ])
+        new_data['lote_treevia'] = list([
+            utils.get_last_values_by_date(tl_data, 'macs', mac, 'lote_treevia', 'data')
+            for mac in macs.splitlines()
+        ])
+
     records = json.loads(new_data.to_json(orient='records', date_format='iso'))
     if new_data.shape[0] != 0:
         st.markdown('Preview dos dados')
@@ -111,9 +124,11 @@ if st.session_state['authentication_status']:
     
     cols = st.columns((.3,.3,.3))
     with cols[1]:
-        st.button('Subir', on_click=utils.update_sensores, 
+        button = st.button('Subir', on_click=utils.update_sensores, 
                   args=[records, conn], disabled=disable_button,
                   use_container_width=True, type='primary')
+    if button:
+        st.cache_data.clear()
 
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
