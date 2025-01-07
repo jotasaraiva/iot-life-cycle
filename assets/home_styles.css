@@ -1,11 +1,11 @@
 :root {
     --verde: #92bb49;
-    --cinza: #e6e6e6;
     --azul: #081f44;
+    --cinza: #d0d0d0;
 }
 
 .block-container {
-    padding-top: 1rem;
+    padding-top: 0.2rem;
     padding-bottom: 0rem;
     padding-left: 5rem;
     padding-right: 5rem;
@@ -16,13 +16,21 @@
 }
 
 div.stMetric {
+    background-color: var(--azul);
     border-radius: 10px;
-    background-color: var(--cinza);
     padding: 10px;
 }
 
+label[data-testid="stMetricLabel"] {
+    color: whitesmoke;
+}
+
+div[data-testid="stMetricValue"] > div {
+    color: whitesmoke;
+}
+
 .stColumn {
-    background-color: whitesmoke;
+    background-color: var(--cinza);
     padding: 10px;
     border-radius: 10px;
 }
