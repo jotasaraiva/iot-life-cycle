@@ -170,9 +170,12 @@ def get_last_values_by_date(df, match_column, match_value, target_column, date_c
 
     filter_df = df[df[match_column] == match_value]
     sort_df = filter_df.sort_values(by=date_column, ascending=True)
-    last_values = sort_df[target_column].iloc[-1]
-    
-    return last_values
+
+    if len(sort_df[target_column]) >= 1: 
+        last_values = sort_df[target_column].iloc[-1]
+        return last_values
+    else:
+        return None
 
 # Global vars
 clientes = [
