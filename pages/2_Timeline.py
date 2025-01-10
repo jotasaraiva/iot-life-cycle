@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
-import plotly.express as px
+import numpy as np
 from src import utils
 from st_supabase_connection import SupabaseConnection, execute_query
 import pathlib
@@ -36,7 +36,20 @@ if st.session_state['authentication_status']:
     rows = execute_query(conn.table("timeline").select("*"), ttl="5m")
     time_data = pd.DataFrame(rows.data)
 
-    time_data = time_data.sort_values(ascending=True, by='data')
+    lotes_recebimento = time_data['lote_recebimento'].dropna().unique()
+    lotes_treevia = time_data['lote_treevia'].dropna().unique()
+    max_date = utils.convert_date(time_data['data'].max())
+    min_date = utils.convert_date(time_data['data'].min())
+
+    with st.sidebar:
+        st.selectbox('Cliente', utils.clientes, index=None)
+        st.selectbox('Lote de Recebimento', lotes_recebimento, index=None)
+        st.selectbox('Cliente', lotes_treevia, index=None)
+        st.slider('Intervalo', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
+
+    time_data = time_data.sort_values(ascending=True, by=['macs', 'data'])
+    time_data['retorno'] = np.where((time_data['status'] == 'Estoque') & (time_data['origem'] == 'Fornecedor'), 'inicio', None)
+    time_data['retorno'] = np.where((time_data['status'] == 'Estoque') & (time_data['origem'] == 'Cliente'), 'fim', time_data['retorno'])
 
     st.dataframe(time_data)
 

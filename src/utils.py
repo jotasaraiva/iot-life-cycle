@@ -1,6 +1,7 @@
 import streamlit as st
 import requests as rqs
 import pandas as pd
+from datetime import datetime
 import plotly.graph_objects as go
 from st_supabase_connection import SupabaseConnection, execute_query
 
@@ -190,6 +191,9 @@ def expand_dates_by_group(df, date_column, group_column):
             expanded_df = pd.concat([expanded_df, group_data], ignore_index=True)
 
         return expanded_df
+
+def convert_date(x):
+    return datetime.strptime(x, '%Y-%m-%d').date()
 
 # Global vars
 clientes = [
