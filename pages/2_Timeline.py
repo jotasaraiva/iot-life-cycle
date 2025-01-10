@@ -47,11 +47,16 @@ if st.session_state['authentication_status']:
         st.selectbox('Cliente', lotes_treevia, index=None)
         st.slider('Intervalo', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
-    time_data = time_data.sort_values(ascending=True, by=['macs', 'data'])
     time_data['retorno'] = np.where((time_data['status'] == 'Estoque') & (time_data['origem'] == 'Fornecedor'), 'inicio', None)
     time_data['retorno'] = np.where((time_data['status'] == 'Estoque') & (time_data['origem'] == 'Cliente'), 'fim', time_data['retorno'])
 
     st.dataframe(time_data)
+
+    def calculate(group):
+        return utils.convert_date(group['data'].max()) - utils.convert_date(group['data'].min())
+
+    test = time_data.groupby('macs').apply(calculate, include_groups=False)
+    st.text(test)
 
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
