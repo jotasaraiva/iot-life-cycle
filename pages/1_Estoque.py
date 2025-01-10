@@ -71,10 +71,11 @@ if st.session_state['authentication_status']:
             if var not in globals() or globals()[var] == '':
                 globals()[var] = None
 
-    make_exist(['cliente', 'lote_recebimento', 'lote_treevia', 'origem', 'diag'])
+    make_exist(['cliente', 'lote_recebimento', 'lote_treevia', 'origem', 'diag', 'ciclo'])
 
     # validação de dados do formulário
     if macs != '':
+        ciclo = None
         if status == 'Cliente':
             if cliente != '':
                 disable_button = False
@@ -104,7 +105,8 @@ if st.session_state['authentication_status']:
             'lote_recebimento': lote_recebimento,
             'lote_treevia': lote_treevia,
             'defeito': defeito,
-            'diag': diag
+            'diag': diag,
+            'ciclo': ciclo
         })
     
     if status in ('Remanufatura', 'Cliente'):
@@ -116,6 +118,14 @@ if st.session_state['authentication_status']:
             utils.get_last_values_by_date(tl_data, 'macs', mac, 'lote_treevia', 'data')
             for mac in macs.splitlines()
         ])
+
+    def get_last_cycle(df):
+        df = df.sort_values('data')
+        last_cycle = df['ciclo'].max()
+        if isinstance(last_cycle, int):
+            return last_cycle
+        else: 
+            return 1
 
     records = json.loads(new_data.to_json(orient='records', date_format='iso'))
     if new_data.shape[0] != 0:
