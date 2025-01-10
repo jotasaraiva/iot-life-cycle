@@ -169,14 +169,17 @@ def pie_plotly(data, name, value, title, height):
 
 def get_last_values_by_date(df, match_column, match_value, target_column, date_column):
 
-    filter_df = df[df[match_column] == match_value]
-    sort_df = filter_df.sort_values(by=date_column, ascending=True)
+    try:
+        filter_df = df[df[match_column] == match_value]
+        sort_df = filter_df.sort_values(by=date_column, ascending=True)
 
-    if len(sort_df[target_column]) >= 1: 
-        last_values = sort_df[target_column].iloc[-1]
-        return last_values
-    else:
-        return None
+        if len(sort_df[target_column]) >= 1: 
+            last_values = sort_df[target_column].iloc[-1]
+            return last_values
+        else:
+            return None
+    except:
+        return 1
 
 def expand_dates_by_group(df, date_column, group_column):
         
@@ -191,6 +194,12 @@ def expand_dates_by_group(df, date_column, group_column):
             expanded_df = pd.concat([expanded_df, group_data], ignore_index=True)
 
         return expanded_df
+
+def increase_cycle(x):
+    if x == 1:
+        return x
+    else:
+        return x+1
 
 def convert_date(x):
     return datetime.strptime(x, '%Y-%m-%d').date()

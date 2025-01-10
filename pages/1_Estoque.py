@@ -119,13 +119,17 @@ if st.session_state['authentication_status']:
             for mac in macs.splitlines()
         ])
 
-    def get_last_cycle(df):
-        df = df.sort_values('data')
-        last_cycle = df['ciclo'].max()
-        if isinstance(last_cycle, int):
-            return last_cycle
-        else: 
-            return 1
+    if origem != 'Fornecedor':
+        new_data['ciclo'] = list([
+            utils.get_last_values_by_date(tl_data, 'macs', mac, 'ciclo', 'data')
+            for mac in macs.splitlines()
+        ])
+    else:
+        new_data['ciclo'] = list([
+            utils.get_last_values_by_date(tl_data, 'macs', mac, 'ciclo', 'data')
+            for mac in macs.splitlines()
+        ])
+
 
     records = json.loads(new_data.to_json(orient='records', date_format='iso'))
     if new_data.shape[0] != 0:
