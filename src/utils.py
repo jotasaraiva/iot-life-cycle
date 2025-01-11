@@ -167,33 +167,23 @@ def pie_plotly(data, name, value, title, height):
     
     return pie
 
-def get_last_values_by_date(df, match_column, match_value, target_column, date_column):
-
+def get_batch(df, match_column, match_value, target_column, date_column):
     try:
         filter_df = df[df[match_column] == match_value]
         sort_df = filter_df.sort_values(by=date_column, ascending=True)
-
-        if len(sort_df[target_column]) >= 1: 
-            last_values = sort_df[target_column].iloc[-1]
-            return last_values
-        else:
-            return None
+        last_value = sort_df[target_column].iloc[-1]
+        return last_value
+    except:
+        return None
+    
+def get_cycle(df, match_column, match_value, target_column, date_column, increase=0):
+    try:
+        filter_df = df[df[match_column] == match_value]
+        sort_df = filter_df.sort_values(by=date_column, ascending=True)
+        last_values = sort_df[target_column].iloc[-1]
+        return last_values + increase
     except:
         return 1
-
-def expand_dates_by_group(df, date_column, group_column):
-        
-        df[date_column] = pd.to_datetime(df[date_column])
-        expanded_df = pd.DataFrame()
-        for group, group_data in df.groupby(group_column):
-            full_date_range = pd.date_range(start=group_data[date_column].min(), 
-                                            end=group_data[date_column].max())
-            group_data = group_data.set_index(date_column).reindex(full_date_range)
-            group_data = group_data.reset_index().rename(columns={"index": date_column})
-            group_data[group_column] = group
-            expanded_df = pd.concat([expanded_df, group_data], ignore_index=True)
-
-        return expanded_df
 
 def increase_cycle(x):
     if x == 1:

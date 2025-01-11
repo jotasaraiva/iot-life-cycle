@@ -111,25 +111,24 @@ if st.session_state['authentication_status']:
     
     if status in ('Remanufatura', 'Cliente'):
         new_data['lote_recebimento'] = list([
-            utils.get_last_values_by_date(tl_data, 'macs', mac, 'lote_recebimento', 'data')
+            utils.get_batch(tl_data, 'macs', mac, 'lote_recebimento', 'data')
             for mac in macs.splitlines()
         ])
         new_data['lote_treevia'] = list([
-            utils.get_last_values_by_date(tl_data, 'macs', mac, 'lote_treevia', 'data')
+            utils.get_batch(tl_data, 'macs', mac, 'lote_treevia', 'data')
             for mac in macs.splitlines()
         ])
 
-    if origem != 'Fornecedor':
+    if status == 'Estoque' and origem == 'Fornecedor':
         new_data['ciclo'] = list([
-            utils.get_last_values_by_date(tl_data, 'macs', mac, 'ciclo', 'data')
+            utils.get_cycle(tl_data, 'macs', mac, 'ciclo', 'data', 1)
             for mac in macs.splitlines()
         ])
     else:
         new_data['ciclo'] = list([
-            utils.get_last_values_by_date(tl_data, 'macs', mac, 'ciclo', 'data')
+            utils.get_cycle(tl_data, 'macs', mac, 'ciclo', 'data')
             for mac in macs.splitlines()
         ])
-
 
     records = json.loads(new_data.to_json(orient='records', date_format='iso'))
     if new_data.shape[0] != 0:
