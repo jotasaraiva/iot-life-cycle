@@ -2,6 +2,7 @@ import streamlit as st
 import requests as rqs
 import pandas as pd
 import numpy as np
+import plotly.express as px
 from datetime import datetime
 import plotly.graph_objects as go
 from st_supabase_connection import SupabaseConnection, execute_query
@@ -26,19 +27,13 @@ def call_exchange():
     exch = rqs.get(st.secrets["exchange_url"])
     return exch
 
-def filter_dataframe(df, cliente=None, lote_receb=None, lote_trv=None, dates=None):
+def filter_dataframe(df, macs=None, dates=None):
 
-    if cliente is not None:
-        df = df[df['cliente'] == cliente]
-    
-    if lote_receb is not None:
-        df = df[df['lote_recebimento'] == lote_receb]
-
-    if lote_trv is not None:
-        df = df[df['lote_treevia'] == lote_trv]
+    if len(macs) >= 1:
+        df = df[df['macs'].isin(macs)]
 
     if dates is not None:
-        df = df[df['data'].between(dates[0], dates[1])]  
+        df = df[df['data'].dt.date.between(dates[0], dates[1])]  
 
     return df
 
@@ -104,14 +99,14 @@ def custom_mean(x):
     if len(x) > 1:
         res = np.sum(x)/(len(x)-1)
     else:
-        res = np.sum(x)/len(x)
+        res = None
     return res
 
 def avg_fail_time(df):
     agg_data = (
         df
             .groupby(['macs', 'ciclo'])
-            .apply(failure_time, include_groups=False)
+            .apply(delta_time, include_groups=False)
             .reset_index(name='fail_time')
             .groupby('macs')
             .agg({'fail_time': [len, custom_mean]})
@@ -123,7 +118,20 @@ def avg_fail_time(df):
 
     return agg_data
 
-failure_time = lambda group: int((group['data'].max() - group['data'].min()).days)
+def time_bar_plot(df, var):
+    bar_data = (
+        df
+        .groupby([var, 'data'])
+        .size()
+        .reset_index(name='counts')
+        .sort_values(by='data')
+    )  
+    bar_data['data'] = bar_data['data'].dt.strftime('%Y-%m-%d')
+    fig = px.bar(bar_data, x='data', y='counts', orientation='v', color=var, barmode='relative')
+    fig.update_layout(height=300, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    return fig
+
+delta_time = lambda group: int((group['data'].max() - group['data'].min()).days)
 
 # Global vars
 clientes = [

@@ -31,41 +31,41 @@ if st.session_state['authentication_status'] == False or st.session_state['authe
 
 # Layout
 if st.session_state['authentication_status']:
-
     conn = st.connection("supabase", type=SupabaseConnection)
+
     rows = execute_query(conn.table("timeline").select("*"), ttl="5m")
     time_data = pd.DataFrame(rows.data)
-    time_data['data'] = pd.to_datetime(time_data['data']).dt.date
-
-    lotes_recebimento = time_data['lote_recebimento'].dropna().unique()
-    lotes_treevia = time_data['lote_treevia'].dropna().unique()
-    clientes = time_data['cliente'].dropna().unique()
-    max_date = time_data['data'].max()
-    min_date = time_data['data'].min()
+    time_data['data'] = pd.to_datetime(time_data['data'])
+    
+    max_date = time_data['data'].dt.date.max()
+    min_date = time_data['data'].dt.date.min()
 
     with st.sidebar:
-        flt_cliente = st.selectbox('Cliente', clientes, index=None)
-        flt_lote_rec = st.selectbox('Lote de Recebimento', lotes_recebimento, index=None)
-        flt_lote_trv = st.selectbox('Lote Interno', lotes_treevia, index=None)
-        flt_date = st.slider('Intervalo', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
+        flt_macs = st.text_area('MACs').splitlines()
+        flt_date = st.slider('Data de Cadastro', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
-    agg_data = utils.avg_fail_time(time_data)
-
-    st.dataframe(time_data, use_container_width=True, hide_index=True)
-    st.dataframe(agg_data, use_container_width=True, hide_index=True)
-
-    bar_data = (
-        time_data
-        .groupby(['status', 'data'])
-        .size()
-        .reset_index(name='counts')
-        .sort_values(by='data')
-    )   
-
-    #fig = px.bar(bar_data, x='data', y='counts', orientation='h', color='status', barmode='group')
-
-    st.dataframe(bar_data)
+    time_data = utils.filter_dataframe(time_data, flt_macs, flt_date)
     
+    agg_data = utils.avg_fail_time(time_data)
+    avg_num_cycles = round(agg_data['num_ciclos'].mean(), 2)
+    try: avg_fail_time = int(agg_data['tempo_medio_falha'].mean()) 
+    except: avg_fail_time = 0
+
+    bar_plot = utils.time_bar_plot(time_data, 'status')
+
+    cols1 = st.columns((.2, .3, .6))
+    with cols1[0]:
+        st.metric('Nº Médio de Ciclos', avg_num_cycles)
+        st.metric('Tempo Médio de Falha', str(avg_fail_time) + ' dias')
+    with cols1[1]:
+        st.dataframe(agg_data, use_container_width=True, hide_index=True, height=200)
+    with cols1[2]:
+        st.dataframe(time_data, use_container_width=True, hide_index=True, height=200)
+
+    cols2 = st.columns(1)
+    with cols2[0]:
+        st.plotly_chart(bar_plot)
+
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
 
