@@ -42,29 +42,32 @@ if st.session_state['authentication_status']:
     tl_data = pd.DataFrame(tl_rows.data)
 
     st.markdown('## Cadastro de Estoque')
-    macs = st.text_area('MACs')
-    data = st.date_input('Data', format='DD/MM/YYYY')
 
-    nrows = len(macs.splitlines())
-    disable_button = True
+    form = st.container(border=True)
+    with form:
+        macs = st.text_area('MACs')
+        data = st.date_input('Data', format='DD/MM/YYYY')
+        status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default=None)
 
-    # formulário de cadastro de estoque
-    status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default=None)
-    if status == 'Cliente':
-        cliente = st.selectbox('Cliente', tuple(utils.clientes))
-        defeito = False
-    elif status == 'Estoque':
-        origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
-        if origem == 'Fornecedor':
-            lote_recebimento = st.text_input('Lote de Recebimento')
-            lote_treevia = st.text_input('Lote Interno')
-        defeito = st.radio('Defeito', (True, False), index=1, format_func=utils.format_bool)
-        if defeito:
-            diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
-    elif status == 'Remanufatura':
-        defeito = False
-    elif status == None:
-        defeito = False
+        nrows = len(macs.splitlines())
+        disable_button = True
+
+        # formulário de cadastro de estoque
+        if status == 'Cliente':
+            cliente = st.selectbox('Cliente', tuple(utils.clientes))
+            defeito = False
+        elif status == 'Estoque':
+            origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
+            if origem == 'Fornecedor':
+                lote_recebimento = st.text_input('Lote de Recebimento')
+                lote_treevia = st.text_input('Lote Interno')
+            defeito = st.radio('Defeito', (True, False), index=1, format_func=utils.format_bool)
+            if defeito:
+                diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
+        elif status == 'Remanufatura':
+            defeito = False
+        elif status == None:
+            defeito = False
 
     def make_exist(vars):
         for var in vars:
@@ -137,7 +140,7 @@ if st.session_state['authentication_status']:
     
     cols = st.columns((.3,.3,.3))
     with cols[1]:
-        button = st.button('Subir', on_click=utils.update_sensores, 
+        button = st.button('Cadastrar', on_click=utils.update_sensores, 
                   args=[records, conn], disabled=disable_button,
                   use_container_width=True, type='primary')
     if button:
