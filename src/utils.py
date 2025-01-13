@@ -107,6 +107,22 @@ def custom_mean(x):
         res = np.sum(x)/len(x)
     return res
 
+def avg_fail_time(df):
+    agg_data = (
+        df
+            .groupby(['macs', 'ciclo'])
+            .apply(failure_time, include_groups=False)
+            .reset_index(name='fail_time')
+            .groupby('macs')
+            .agg({'fail_time': [len, custom_mean]})
+    )
+
+    agg_data.columns = agg_data.columns.droplevel()
+    agg_data.reset_index(inplace=True)
+    agg_data = agg_data.rename(columns={'len': 'num_ciclos', 'custom_mean': 'tempo_medio_falha'})
+
+    return agg_data
+
 failure_time = lambda group: int((group['data'].max() - group['data'].min()).days)
 
 # Global vars

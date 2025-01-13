@@ -1,7 +1,7 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
-import numpy as np
+import plotly.express as px
 from src import utils
 from st_supabase_connection import SupabaseConnection, execute_query
 import pathlib
@@ -49,22 +49,22 @@ if st.session_state['authentication_status']:
         flt_lote_trv = st.selectbox('Lote Interno', lotes_treevia, index=None)
         flt_date = st.slider('Intervalo', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
-    filter_data = utils.filter_dataframe(time_data, flt_cliente, flt_lote_rec, flt_lote_trv, flt_date)
+    agg_data = utils.avg_fail_time(time_data)
 
-    agg_data = (
-        filter_data
-            .groupby(['macs', 'ciclo'])
-            .apply(utils.failure_time, include_groups=False)
-            .reset_index(name='fail_time')
-            .groupby('macs')
-            .agg({'fail_time': [len, utils.custom_mean]})
-    )
-
-    agg_data.columns = agg_data.columns.droplevel()
-    agg_data.reset_index(inplace=True)
-
-    st.dataframe(filter_data, use_container_width=True, hide_index=True)
+    st.dataframe(time_data, use_container_width=True, hide_index=True)
     st.dataframe(agg_data, use_container_width=True, hide_index=True)
+
+    bar_data = (
+        time_data
+        .groupby(['status', 'data'])
+        .size()
+        .reset_index(name='counts')
+        .sort_values(by='data')
+    )   
+
+    #fig = px.bar(bar_data, x='data', y='counts', orientation='h', color='status', barmode='group')
+
+    st.dataframe(bar_data)
     
     # Logout
     st.session_state['authenticator'].logout(location='sidebar')
