@@ -40,8 +40,20 @@ if st.session_state['authentication_status']:
     conn = st.connection("supabase", type=SupabaseConnection)
     rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
     estq_data = pd.DataFrame(rows.data)
+    estq_data['data'] = pd.to_datetime(estq_data['data'])
     cols1 = st.columns((.2, .2, .2, .4))
     
+    with st.sidebar:
+        max_date = estq_data['data'].dt.date.max()
+        min_date = estq_data['data'].dt.date.min()
+        clientes = estq_data['cliente'].dropna().unique()
+
+        flt_status = st.multiselect('Status', ('Estoque', 'Cliente', 'Remanufatura'))
+        flt_cliente = st.multiselect('Clientes', clientes) if 'Cliente' in flt_status else None
+        flt_date = st.slider('Data de Cadastro', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
+
+    estq_data = utils.filter_home(estq_data, flt_cliente, flt_status, flt_date)
+
     with cols1[0]:
         st.metric(
             'IoTs em Estoque', 

@@ -27,13 +27,26 @@ def call_exchange():
     exch = rqs.get(st.secrets["exchange_url"])
     return exch
 
-def filter_dataframe(df, macs=None, dates=None):
+def filter_timeline(df, macs=None, dates=None):
 
-    if len(macs) >= 1:
+    if macs is not None and len(macs) >= 1:
         df = df[df['macs'].isin(macs)]
 
     if dates is not None:
         df = df[df['data'].dt.date.between(dates[0], dates[1])]  
+
+    return df
+
+def filter_home(df, clientes, status, dates):
+
+    if status is not None and len(status) >= 1:
+        df = df[df['status'].isin(status)]
+
+    if clientes is not None and len(clientes) >= 1:
+        df = df[df['cliente'].isin(clientes)]
+
+    if dates is not None:
+        df = df[df['data'].dt.date.between(dates[0], dates[1])]
 
     return df
 

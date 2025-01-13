@@ -44,7 +44,7 @@ if st.session_state['authentication_status']:
         flt_macs = st.text_area('MACs').splitlines()
         flt_date = st.slider('Data de Cadastro', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
-    time_data = utils.filter_dataframe(time_data, flt_macs, flt_date)
+    time_data = utils.filter_timeline(time_data, flt_macs, flt_date)
     
     agg_data = utils.avg_fail_time(time_data)
     avg_num_cycles = round(agg_data['num_ciclos'].mean(), 2)
