@@ -88,8 +88,9 @@ if st.session_state['authentication_status']:
             plot_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(bars, use_container_width=True)
 
-    st.dataframe(estq_data, height=210, hide_index=True, use_container_width=True)      
-    authenticator.logout(location='sidebar')
+    st.dataframe(estq_data, height=210, hide_index=True, use_container_width=True)     
+
+    utils.log_out()
 
 elif st.session_state['authentication_status'] == False:
     st.toast('Username/password incorrect.')

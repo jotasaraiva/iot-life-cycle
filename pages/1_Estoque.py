@@ -144,4 +144,4 @@ if st.session_state['authentication_status']:
         st.cache_data.clear()
 
     # Logout
-    st.session_state['authenticator'].logout(location='sidebar')
+    utils.log_out()

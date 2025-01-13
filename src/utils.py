@@ -131,6 +131,12 @@ def time_bar_plot(df, var):
     fig.update_layout(height=300, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
     return fig
 
+def log_out():
+        with st.sidebar:
+            sb_cols = st.columns(3)
+            with sb_cols[1]:
+                st.session_state['authenticator'].logout()
+
 delta_time = lambda group: int((group['data'].max() - group['data'].min()).days)
 
 # Global vars

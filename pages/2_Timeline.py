@@ -67,7 +67,7 @@ if st.session_state['authentication_status']:
         st.plotly_chart(bar_plot)
 
     # Logout
-    st.session_state['authenticator'].logout(location='sidebar')
+    utils.log_out()
 
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
     st.switch_page('Home.py')
