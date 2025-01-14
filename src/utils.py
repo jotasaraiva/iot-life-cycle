@@ -141,7 +141,13 @@ def time_bar_plot(df, var):
     )  
     bar_data['data'] = bar_data['data'].dt.strftime('%Y-%m-%d')
     fig = px.bar(bar_data, x='data', y='counts', orientation='v', color=var, barmode='relative')
-    fig.update_layout(height=300, paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)')
+    fig.update_layout(
+        xaxis_title=None,
+        yaxis_title=None,
+        height=200, 
+        paper_bgcolor='rgba(0,0,0,0)', 
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=0, r=0, t=0, b=0))
     return fig
 
 def log_out():

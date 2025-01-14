@@ -112,7 +112,7 @@ if st.session_state['authentication_status']:
             'ciclo': ciclo
         })
     
-    if status in ('Remanufatura', 'Cliente'):
+    if (status in ('Remanufatura', 'Cliente')) or (status == 'Estoque' and origem == 'Cliente'):
         new_data['lote_recebimento'] = list([
             utils.get_batch(tl_data, 'macs', mac, 'lote_recebimento', 'data')
             for mac in macs.splitlines()

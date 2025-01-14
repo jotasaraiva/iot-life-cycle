@@ -53,18 +53,21 @@ if st.session_state['authentication_status']:
 
     bar_plot = utils.time_bar_plot(time_data, 'status')
 
-    cols1 = st.columns((.2, .3, .6))
+    cols1 = st.columns((.2, .8))
     with cols1[0]:
         st.metric('Nº Médio de Ciclos', avg_num_cycles)
         st.metric('Tempo Médio de Falha', str(avg_fail_time) + ' dias')
     with cols1[1]:
-        st.dataframe(agg_data, use_container_width=True, hide_index=True, height=200)
-    with cols1[2]:
-        st.dataframe(time_data, use_container_width=True, hide_index=True, height=200)
-
-    cols2 = st.columns(1)
-    with cols2[0]:
         st.plotly_chart(bar_plot)
+
+    cols2 = st.columns((.35, .65))
+    with cols2[0]:
+        st.markdown('**N° de Ciclos x Tempo Médio para Falha**')
+        st.dataframe(agg_data, use_container_width=True, hide_index=True, height=300)
+    with cols2[1]:
+        st.markdown('**Registros de Timeline**')
+        st.dataframe(time_data, use_container_width=True, hide_index=True, height=300)
+        
 
     # Logout
     utils.log_out()
