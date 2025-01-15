@@ -3,6 +3,11 @@ import streamlit_authenticator as stauth
 import pandas as pd
 from src import utils
 import datetime
+import uuid
+import numpy as np
+import json
+from st_supabase_connection import SupabaseConnection, execute_query
+import pathlib
 
 # Page config
 st.set_page_config(page_title="Treevia LC - Timeline", layout='wide')
@@ -14,181 +19,132 @@ st.logo(logo_path)
 with st.sidebar:
     st.image(name_path)
 
-# Custom CSS
-st.markdown("""
-        <style>
-               .block-container {
-                    padding-top: 3rem;
-                    padding-bottom: 0rem;
-                    padding-left: 5rem;
-                    padding-right: 5rem;
-                }
-                button[title="View fullscreen"]{
-                    visibility: hidden;}
-        </style>
-        
-        """, unsafe_allow_html=True)
-
-# Global vars
-clientes = [
-    "ELKS Engenharia Florestal e Ambiental Ltda",
-    "BRF",
-    "Bracell São Paulo",
-    "WorldTree",
-    "Suzano Inventário",
-    "SLB",
-    "CLIENTE TREINAMENTO",
-    "Treevia Consultoria",
-    "Klabin",
-    "Saint-Gobain",
-    "Melhoramentos Florestal",
-    "Agencia Florestal Ltda",
-    "CMPC",
-    "Bracell Bahia Florestal",
-    "Marques_Pro",
-    "Simasul Siderurgia",
-    "Desafio Cabruca",
-    "Placas do Brasil S.A",
-    "UNESP",
-    "TRC",
-    "Projeto UFT",
-    "High Precision",
-    "Gaia Agroflorestal",
-    "QA - Ambiente de Testes",
-    "Treevia Forest Technologies",
-    "Corus Agroflorestal",
-    "Teste Veracel",
-    "Forte Florestal",
-    "Veracel",
-    "Radix",
-    "demo_treevia",
-    "Grupo Mutum",
-    "Treevia - Equipe de Quality Analyst",
-    "Bracell",
-    "Remasa",
-    "G2 Forest",
-    "Inventec",
-    "KLINGELE PAPER NOVA CAMPINA LTDA",
-    "R.S FLORESTAL LTDA",
-    "Trial 2a Rotação",
-    "NORFLOR EMPREENDIMENTOS AGRÍCOLAS S/A",
-    "GELF SIDERURGIA S/A",
-    "ALJIBES AZULES S.A",
-    "Trail",
-    "SFDEMO2",
-    "PARCEL REFLORESTADORA LDTA",
-    "TTG Brasil Investimentos Florestais Ltda.",
-    "Suzano Papel e Celulose",
-    "Smart Forest Demo 2",
-    "High Precision Demo",
-    "3A Composites",
-    "Laminados AB",
-    "Projeto NANORAD'S",
-    "Floresta Assesoria e Planejamento Florestal LTDA",
-    "Farol Consultoria Agroflorestal",
-    "Madeireira Rio Claro",
-    "LIF - Land Inovation Fund",
-    "Taboão Reflorestamento SA",
-    "Colpar Participações",
-    "Agrobusiness Floresta e Pecuária",
-    "Cenibra",
-    "Unesp - Acadêmico",
-    "Google_PlayStore",
-    "Topo_Floresta",
-    "MANTENA FLORESTAL S.A.",
-    "FoxFlorestal",
-    "Treevia - Equipe de Desenvolvimento",
-    "Vallourec",
-    "Eldorado Brasil Celulose S/A",
-    "Eldorado Máxima Produtividade",
-    "Atenil S.A.",
-    "Teste Front 2.0 - Apagar EAGG",
-    "Test_Front 2.0",
-    "Treevia - Equipe de Data Analisys",
-    "Norflor Prognose Apresentacao",
-    "Thalis",
-    "Smart Forest Demo",
-    "Aldeir Testes Corporation",
-    "Brafor Projetos Ambientais Ltda",
-    " Eldorado Inventario Tradicional",
-    "Minasligas",
-    "PONTUAL BIOENERGIA LTDA",
-    "Teste IFQ",
-    "The Nature Conservancy",
-    "Treevia Academy"
-]
+# CSS config
+def load_css(file_path):
+    with open(file_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+css_path = pathlib.Path(__file__).parents[1] / "assets" / "stock_styles.css"
+load_css(css_path)
 
 # Check authentication state
 if 'authenticator' not in st.session_state:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
     
 # Layout
 if st.session_state['authentication_status']:
 
-    # API Calls
-    devc = utils.call_device()
+    conn = st.connection("supabase", type=SupabaseConnection)
+    estq_rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
+    estq_data = pd.DataFrame(estq_rows.data)
+    tl_rows = execute_query(conn.table('timeline').select("*"), ttl="5m")
+    tl_data = pd.DataFrame(tl_rows.data)
 
-    # Data
-    devc_data = pd.DataFrame(devc.json()['result'])[['id','devc_cd_macaddress_treevia']]
-    estq_data = pd.read_csv("data/estoque.csv")
+    st.markdown('## Cadastro de Estoque')
 
-    if 'show_form' not in st.session_state:
-        st.session_state['show_form'] = True
-
-    # Layout  
-    with st.popover('Cadastro de Estoque'):
+    form = st.container(border=True)
+    with form:
         macs = st.text_area('MACs')
-        status = st.selectbox('Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
-        lote_receb = None
-        lote_treevia = None
+        data = st.date_input('Data', format='DD/MM/YYYY')
+        status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default=None)
+
+        nrows = len(macs.splitlines())
+        disable_button = True
+
+        # formulário de cadastro de estoque
         if status == 'Cliente':
-            cliente = st.selectbox('Cliente', tuple(clientes))
-            origem = None
+            cliente = st.selectbox('Cliente', tuple(utils.clientes))
+            defeito = False
         elif status == 'Estoque':
             origem = st.radio('Origem', ('Fornecedor', 'Cliente'))
-            cliente = None
             if origem == 'Fornecedor':
-                lote_receb = st.text_input('Lote de Recebimento')
+                lote_recebimento = st.text_input('Lote de Recebimento')
                 lote_treevia = st.text_input('Lote Interno')
-        else:
-            cliente = None
-            origem = None
-        if origem == 'Fornecedor':
-            new_data = pd.DataFrame({
-                'macs': macs.splitlines(),
-                'status': status,
-                'cliente': cliente,
-                'origem': origem,
-                'lote_recebimento': lote_receb,
-                'lote_treevia': lote_treevia,
-                'data': datetime.datetime.today().date()
-            })
-        else:
-            new_data = pd.DataFrame({
-                'macs': macs.splitlines(),
-                'status': status,
-                'cliente': cliente,
-                'origem': origem,
-                'data': datetime.datetime.today().date()
-            })
-        if new_data.shape[0] != 0:
-            st.markdown('Preview')
-            st.dataframe(new_data, use_container_width=True, hide_index=True)
-        st.button('Subir', on_click=utils.update_and_append, 
-                  args=['data/estoque.csv','data/timeline.csv', new_data,'macs'], 
+            defeito = st.radio('Defeito', (True, False), index=1, format_func=utils.format_bool)
+            if defeito:
+                diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
+        elif status == 'Remanufatura':
+            defeito = False
+        elif status == None:
+            defeito = False
+
+    def make_exist(vars):
+        for var in vars:
+            if var not in globals() or globals()[var] == '':
+                globals()[var] = None
+
+    make_exist(['cliente', 'lote_recebimento', 'lote_treevia', 'origem', 'diag', 'ciclo'])
+
+    # validação de dados do formulário
+    if macs != '':
+        ciclo = None
+        if status == 'Cliente':
+            if cliente != '':
+                disable_button = False
+        if status == 'Estoque':
+            if origem == 'Fornecedor':
+                if lote_recebimento != None and lote_treevia != None:
+                    if defeito:
+                        if diag != None:
+                            disable_button = False
+                    elif not defeito:
+                        disable_button = False
+            if origem == 'Cliente':
+                if defeito:
+                        if diag != None:
+                            disable_button = False
+                elif not defeito:
+                    disable_button = False
+        if status == 'Remanufatura':
+            disable_button = False
+
+    new_data = pd.DataFrame({
+            'macs': macs.splitlines(),
+            'status': status,
+            'cliente': cliente,
+            'data': data,
+            'origem': origem,
+            'lote_recebimento': lote_recebimento,
+            'lote_treevia': lote_treevia,
+            'defeito': defeito,
+            'diag': diag,
+            'ciclo': ciclo
+        })
+    
+    if (status in ('Remanufatura', 'Cliente')) or (status == 'Estoque' and origem == 'Cliente'):
+        new_data['lote_recebimento'] = list([
+            utils.get_batch(tl_data, 'macs', mac, 'lote_recebimento', 'data')
+            for mac in macs.splitlines()
+        ])
+        new_data['lote_treevia'] = list([
+            utils.get_batch(tl_data, 'macs', mac, 'lote_treevia', 'data')
+            for mac in macs.splitlines()
+        ])
+
+    if status == 'Estoque' and origem == 'Fornecedor':
+        new_data['ciclo'] = list([
+            utils.get_cycle(tl_data, 'macs', mac, 'ciclo', 'data', 1)
+            for mac in macs.splitlines()
+        ])
+    else:
+        new_data['ciclo'] = list([
+            utils.get_cycle(tl_data, 'macs', mac, 'ciclo', 'data')
+            for mac in macs.splitlines()
+        ])
+
+    records = json.loads(new_data.to_json(orient='records', date_format='iso'))
+    if new_data.shape[0] != 0:
+        st.markdown('Preview dos dados')
+        st.dataframe(new_data, use_container_width=True, hide_index=True)
+    
+    cols = st.columns((.3,.3,.3))
+    with cols[1]:
+        button = st.button('Cadastrar', on_click=utils.update_sensores, 
+                  args=[records, conn], disabled=disable_button,
                   use_container_width=True, type='primary')
-        
-    # Filters
-    with st.sidebar:
-        flt_cliente = st.selectbox('Filtro de Clientes', tuple(clientes), index=None)
-        flt_status = st.selectbox('Filtro de Status', ('Estoque', 'Cliente', 'Remanufatura'), index=None)
-
-    filtered = utils.filter_dataframe(estq_data, flt_cliente, flt_status)
-
-    # Table
-    st.dataframe(filtered, use_container_width=True, hide_index=True, height=600)
+    if button:
+        st.cache_data.clear()
 
     # Logout
-    st.session_state['authenticator'].logout(location='sidebar')
+    utils.log_out()

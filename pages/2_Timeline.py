@@ -3,6 +3,8 @@ import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
 from src import utils
+from st_supabase_connection import SupabaseConnection, execute_query
+import pathlib
 
 # Page config
 st.set_page_config(page_title="Treevia LC - Timeline", layout='wide')
@@ -14,44 +16,67 @@ st.logo(logo_path)
 with st.sidebar:
     st.image(name_path)
 
-# Custom CSS
-st.markdown("""
-        <style>
-               .block-container {
-                    padding-top: 3rem;
-                    padding-bottom: 0rem;
-                    padding-left: 5rem;
-                    padding-right: 5rem;
-                }
-                button[title="View fullscreen"]{
-                    visibility: hidden;}
-                [data-testid=column]:nth-of-type(1) [data-testid=stVerticalBlock]{
-                    gap: 0rem;
-                }
-        </style>
-        """, unsafe_allow_html=True)
+# CSS config
+def load_css(file_path):
+    with open(file_path) as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+css_path = pathlib.Path(__file__).parents[1] / "assets" / "tl_styles.css"
+load_css(css_path)
 
 # Check authentication state
 if 'authenticator' not in st.session_state:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
+    st.switch_page('Home.py')
 
 # Layout
 if st.session_state['authentication_status']:
+    conn = st.connection("supabase", type=SupabaseConnection)
 
-    tl_data = pd.read_csv('data/timeline.csv')
-    tl_data_group = tl_data.groupby(['data', 'status']).size().reset_index(name='count')
+    rows = execute_query(conn.table("timeline").select("*"), ttl="5m")
+    time_data = pd.DataFrame(rows.data)
+    time_data['data'] = pd.to_datetime(time_data['data'])
+    
+    max_date = time_data['data'].dt.date.max()
+    min_date = time_data['data'].dt.date.min()
 
-    bar = px.bar(tl_data_group, x='data', y='count', color='status', barmode='group', labels={'data': '', 'count': 'N° de Sensores', 'status': 'Status'})
-    bar.update_layout(height=350, margin=dict(l=40, r=40, t=20, b=20))
+    with st.sidebar:
+        flt_macs = st.text_area('MACs').splitlines()
+        flt_date = st.slider('Data de Cadastro', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
-    st.plotly_chart(bar, use_container_width=True)
-    st.dataframe(tl_data, use_container_width=True, hide_index=True, height=280)
+    time_data = utils.filter_timeline(time_data, flt_macs, flt_date)
+    
+    fail_per_cycle = utils.fail_time(time_data)
+    agg_data = utils.avg_fail_time(time_data)
+    avg_num_cycles = round(agg_data['num_ciclos'].mean(), 2)
+    try: avg_fail_time = int(agg_data['tempo_medio_falha'].mean()) 
+    except: avg_fail_time = 0
+
+    bar_plot = utils.time_bar_plot(time_data, 'status')
+    scatter_plot = utils.cycle_plot(fail_per_cycle)
+
+    cols1 = st.columns((.2, .4, .4))
+    with cols1[0]:
+        st.metric('Nº Médio de Ciclos', avg_num_cycles)
+        st.metric('Tempo Médio de Falha', str(avg_fail_time) + ' dias')
+    with cols1[1]:
+        st.plotly_chart(bar_plot, use_container_width=True)
+    with cols1[2]:
+        st.plotly_chart(scatter_plot, use_container_width=True)
+    cols2 = st.columns((.35, .65))
+    with cols2[0]:
+        st.markdown('**N° de Ciclos x Tempo Médio para Falha**')
+        st.dataframe(agg_data, use_container_width=True, hide_index=True, height=300)
+    with cols2[1]:
+        st.markdown('**Ciclo x Tempo para Falha**')
+        st.dataframe(fail_per_cycle, use_container_width=True, hide_index=True, height=300)
+    cols3 = st.columns(1)
+    with cols3[0]:
+        st.markdown('**Registros de Timeline**')
+        st.dataframe(time_data, use_container_width=True, hide_index=True)
 
     # Logout
-    st.session_state['authenticator'].logout(location='sidebar')
+    utils.log_out()
 
 if st.session_state['authentication_status'] == False or st.session_state['authentication_status'] == None:
-    st.switch_page('Dashboard.py')
-
+    st.switch_page('Home.py')
