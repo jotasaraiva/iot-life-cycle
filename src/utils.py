@@ -115,12 +115,20 @@ def custom_mean(x):
         res = None
     return res
 
-def avg_fail_time(df):
-    agg_data = (
+def fail_time(df):
+    fail_per_cycle = (
         df
             .groupby(['macs', 'ciclo'])
             .apply(delta_time, include_groups=False)
             .reset_index(name='fail_time')
+    )
+
+    return fail_per_cycle
+
+def avg_fail_time(df):
+    fail_per_cycle = fail_time(df)
+    agg_data = (
+        fail_per_cycle
             .groupby('macs')
             .agg({'fail_time': [len, custom_mean]})
     )
@@ -144,6 +152,15 @@ def time_bar_plot(df, var):
     fig.update_layout(
         xaxis_title=None,
         yaxis_title=None,
+        height=200, 
+        paper_bgcolor='rgba(0,0,0,0)', 
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=0, r=0, t=0, b=0))
+    return fig
+
+def cycle_plot(df):
+    fig = px.scatter(df, x='ciclo', y='fail_time', hover_data=['macs'])
+    fig.update_layout(
         height=200, 
         paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)',

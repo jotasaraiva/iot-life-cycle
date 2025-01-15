@@ -46,28 +46,34 @@ if st.session_state['authentication_status']:
 
     time_data = utils.filter_timeline(time_data, flt_macs, flt_date)
     
+    fail_per_cycle = utils.fail_time(time_data)
     agg_data = utils.avg_fail_time(time_data)
     avg_num_cycles = round(agg_data['num_ciclos'].mean(), 2)
     try: avg_fail_time = int(agg_data['tempo_medio_falha'].mean()) 
     except: avg_fail_time = 0
 
     bar_plot = utils.time_bar_plot(time_data, 'status')
+    scatter_plot = utils.cycle_plot(fail_per_cycle)
 
-    cols1 = st.columns((.2, .8))
+    cols1 = st.columns((.2, .4, .4))
     with cols1[0]:
         st.metric('Nº Médio de Ciclos', avg_num_cycles)
         st.metric('Tempo Médio de Falha', str(avg_fail_time) + ' dias')
     with cols1[1]:
-        st.plotly_chart(bar_plot)
-
+        st.plotly_chart(bar_plot, use_container_width=True)
+    with cols1[2]:
+        st.plotly_chart(scatter_plot, use_container_width=True)
     cols2 = st.columns((.35, .65))
     with cols2[0]:
         st.markdown('**N° de Ciclos x Tempo Médio para Falha**')
         st.dataframe(agg_data, use_container_width=True, hide_index=True, height=300)
     with cols2[1]:
+        st.markdown('**Ciclo x Tempo para Falha**')
+        st.dataframe(fail_per_cycle, use_container_width=True, hide_index=True, height=300)
+    cols3 = st.columns(1)
+    with cols3[0]:
         st.markdown('**Registros de Timeline**')
-        st.dataframe(time_data, use_container_width=True, hide_index=True, height=300)
-        
+        st.dataframe(time_data, use_container_width=True, hide_index=True)
 
     # Logout
     utils.log_out()
