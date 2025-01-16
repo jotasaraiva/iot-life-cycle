@@ -7,6 +7,7 @@ from datetime import datetime
 import plotly.graph_objects as go
 from st_supabase_connection import SupabaseConnection, execute_query
 
+# Funções para resgatar dados da API Device (não usadas)
 @st.cache_data(show_spinner="Carregando Estoque...")
 def call_estoque():
     estq = rqs.get(st.secrets["estoque_url"])
@@ -27,6 +28,7 @@ def call_exchange():
     exch = rqs.get(st.secrets["exchange_url"])
     return exch
 
+# Filtrar dados da timeline
 def filter_timeline(df, macs=None, dates=None):
 
     if macs is not None and len(macs) >= 1:
@@ -37,6 +39,7 @@ def filter_timeline(df, macs=None, dates=None):
 
     return df
 
+# Filtrar dados de estoque
 def filter_home(df, clientes, status, dates):
 
     if status is not None and len(status) >= 1:
@@ -50,6 +53,7 @@ def filter_home(df, clientes, status, dates):
 
     return df
 
+# Fazer update no banco
 def update_db(data, conn, db):
     response = execute_query(
         conn.table(db).insert(data), ttl=0
@@ -57,6 +61,7 @@ def update_db(data, conn, db):
 
     st.toast(body=response)
 
+# Fazer upsert no banco
 def upsert_db(data, conn, db):
     response = execute_query(
         conn.table(db).upsert(data, on_conflict=['macs'])
@@ -64,14 +69,17 @@ def upsert_db(data, conn, db):
 
     st.toast(body=response)
 
+# Fazer as duas operações anteriores em uma só função
 def update_sensores(data, conn):
     upsert_db(data, conn, 'estoque')
     update_db(data, conn, 'timeline')
 
+# Formatar dados booleanos para Sim e Não
 def format_bool(x):
     res = 'Sim' if x == True else 'Não'
     return res
 
+# Fazer plot rosca
 def pie_plotly(data, name, value, title, height):
     pie = go.Figure(data=[go.Pie(
             labels=data[name], 
@@ -87,6 +95,7 @@ def pie_plotly(data, name, value, title, height):
     
     return pie
 
+# Resgatar dados de lotes
 def get_batch(df, match_column, match_value, target_column, date_column):
     try:
         filter_df = df[df[match_column] == match_value]
@@ -96,6 +105,7 @@ def get_batch(df, match_column, match_value, target_column, date_column):
     except:
         return None
     
+# Resgatar dados de ciclo
 def get_cycle(df, match_column, match_value, target_column, date_column, increase=0):
     try:
         filter_df = df[df[match_column] == match_value]
@@ -105,9 +115,12 @@ def get_cycle(df, match_column, match_value, target_column, date_column, increas
     except:
         return 1
 
+# Converter data
 def convert_date(x):
     return datetime.strptime(x, '%Y-%m-%d').date()
 
+# Média condicional (se tiver um valor apenas, retorna None
+# se tiver mais de um valor, o cálculo é soma(x)/(len(x)-1)
 def custom_mean(x):
     if len(x) > 1:
         res = np.sum(x)/(len(x)-1)
@@ -115,6 +128,7 @@ def custom_mean(x):
         res = None
     return res
 
+# Calcular tempo para falha
 def fail_time(df):
     fail_per_cycle = (
         df
@@ -125,6 +139,7 @@ def fail_time(df):
 
     return fail_per_cycle
 
+# Calcular tempo médio até a falha
 def avg_fail_time(df):
     fail_per_cycle = fail_time(df)
     agg_data = (
@@ -139,6 +154,7 @@ def avg_fail_time(df):
 
     return agg_data
 
+# Plot de barra da timeline
 def time_bar_plot(df, var):
     bar_data = (
         df
@@ -158,6 +174,7 @@ def time_bar_plot(df, var):
         margin=dict(l=0, r=0, t=0, b=0))
     return fig
 
+# Scatterplot de ciclo x tempo para falha
 def cycle_plot(df):
     fig = px.scatter(df, x='ciclo', y='fail_time', hover_data=['macs'])
     fig.update_layout(
@@ -167,6 +184,7 @@ def cycle_plot(df):
         margin=dict(l=0, r=0, t=0, b=0))
     return fig
 
+# Botão de logout
 def log_out():
         with st.sidebar:
             sb_cols = st.columns(3)
@@ -177,9 +195,10 @@ def log_out():
             with sb_cols[1]:
                 st.session_state['authenticator'].logout('Sair')
 
+# Calcular diferença entre data máxima e mínima
 delta_time = lambda group: int((group['data'].max() - group['data'].min()).days)
 
-# Global vars
+# Variáveis globais
 clientes = [
     "ELKS Engenharia Florestal e Ambiental Ltda",
     "BRF",
