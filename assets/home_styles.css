@@ -34,3 +34,7 @@ div[data-testid="stMetricValue"] > div {
     padding: 10px;
     border-radius: 10px;
 }
+
+.stSidebar button[data-testid="stBaseButton-secondary"] {
+    width: 100%;
+}
