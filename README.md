@@ -1,0 +1,5 @@
+# Projeto de Estágio Treevia - Ciclo de Vida IoT
+
+O presente projeto é um web app elaborado em Streamlit como produto de um projeto temático desenvolvido durante meu período de estágio na (Treevia Forest Technologies)[https://treevia.com.br/]. Como uma empresa de tecnologia voltada para o mercado florestal, a companhia é responsável pela concepção e produção de sensores [dendrômetros IoTs](https://treevia.com.br/implantar-sensores-iot-na-floresta/) criados especificamente para o monitoramento florestal de precisão.
+
+Estes sensores são capazes de captar dados de florestas de forma multitemporal e com alta resolução, sendo integrados ao sistema de gestão florestal SmartForest produzido pela companhia. Este app serve como um sistema de gestão e monitoramento de estoque destes sensores, criado com o objetivo de captar e recordar os dados de fornecimento, envio e remanufatura dos dispositivos. Desta forma, o projeto visa o levantamento de indicadores e inteligência de dados úteis para a otimização das operações que envolvem o IoT.
