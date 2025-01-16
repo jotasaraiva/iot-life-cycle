@@ -1,16 +1,15 @@
 import streamlit as st
 import streamlit_authenticator as stauth
 import pandas as pd
-import plotly.graph_objects as go
 import plotly.express as px
 from src import utils
-from datetime import datetime
 from st_supabase_connection import SupabaseConnection, execute_query
 import pathlib
 
-# Page config
+# Configuração da página
 st.set_page_config(page_title="Treevia LC", layout="wide", page_icon='assets/favicon.ico')
 
+# Componente de autenticação
 authenticator = stauth.Authenticate(
     st.secrets['credentials'].to_dict(),
     st.secrets['cookie']['name'],
@@ -27,7 +26,7 @@ name_path="assets/treevia-name.png"
 st.logo(logo_path)
 st.sidebar.image(name_path, use_container_width=True)
 
-# CSS config
+# CSS
 def load_css(file_path):
     with open(file_path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
@@ -37,12 +36,14 @@ load_css(css_path)
 # Layout
 if st.session_state['authentication_status']:
 
+    # Query da database
     conn = st.connection("supabase", type=SupabaseConnection)
     rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
     estq_data = pd.DataFrame(rows.data)
     estq_data['data'] = pd.to_datetime(estq_data['data'])
     cols1 = st.columns((.2, .2, .2, .4))
     
+    # Renderizando filtros
     with st.sidebar:
         max_date = estq_data['data'].dt.date.max()
         min_date = estq_data['data'].dt.date.min()
@@ -52,8 +53,10 @@ if st.session_state['authentication_status']:
         flt_cliente = st.multiselect('Clientes', clientes) if 'Cliente' in flt_status else None
         flt_date = st.slider('Data de Cadastro', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
+    # Aplicando filtros
     estq_data = utils.filter_home(estq_data, flt_cliente, flt_status, flt_date)
 
+    # Renderizando indicadores
     with cols1[0]:
         st.metric(
             'IoTs em Estoque', 
@@ -80,6 +83,7 @@ if st.session_state['authentication_status']:
             'IoTs totais',
             len(estq_data)
         )
+    # Renderizando plots rosca
     with cols1[2]:
         status_pie_data = estq_data.groupby(['status']).size().reset_index(name='counts')
         status_pie = utils.pie_plotly(status_pie_data, 'status', 'counts', 'Status', 140)
@@ -89,6 +93,7 @@ if st.session_state['authentication_status']:
         defeito_pie_data['defeito'] = defeito_pie_data['defeito'].replace({True: 'Defeituosos', False: 'Saudáveis'})
         defeito_pie = utils.pie_plotly(defeito_pie_data, 'defeito', 'counts', 'Defeituosos', 140)
         st.plotly_chart(defeito_pie, use_container_width=True)
+    # Rendering plot de barra
     with cols1[3]:
         bars_data = estq_data.groupby(['cliente']).size().reset_index(name='counts')
         bars = px.bar(bars_data, x='counts', y='cliente', orientation='h')
@@ -99,12 +104,13 @@ if st.session_state['authentication_status']:
             paper_bgcolor='rgba(0,0,0,0)', 
             plot_bgcolor='rgba(0,0,0,0)')
         st.plotly_chart(bars, use_container_width=True)
-
+    # Rendering tabela
     cols2 = st.columns(1)
     with cols2[0]:
         st.markdown('**Estoque**')
         st.dataframe(estq_data, height=210, hide_index=True, use_container_width=True)     
 
+    # Logout
     utils.log_out()
 
 elif st.session_state['authentication_status'] == False:
