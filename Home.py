@@ -9,7 +9,7 @@ from st_supabase_connection import SupabaseConnection, execute_query
 import pathlib
 
 # Page config
-st.set_page_config(page_title="Treevia LC", layout="wide")
+st.set_page_config(page_title="Treevia LC", layout="wide", page_icon='assets/favicon.ico')
 
 authenticator = stauth.Authenticate(
     st.secrets['credentials'].to_dict(),

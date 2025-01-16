@@ -3,7 +3,7 @@ from src import utils
 import pathlib
 
 # Page config
-st.set_page_config(page_title="Treevia LC - Sobre", layout='wide')
+st.set_page_config(page_title="Treevia LC - Sobre", layout='wide', page_icon='assets/favicon.ico')
 
 # Logo
 logo_path="assets/treevia-logo.png"
@@ -32,9 +32,12 @@ if st.session_state['authentication_status']:
         file = pathlib.Path(__file__).parents[1] / path
         return file.read_text(encoding='utf-8')
 
-    intro = read_md('md/intro.md')
+    intro = read_md('assets/about.md')
 
-    st.markdown(intro)
+    page = st.container()
+    with page:
+        st.markdown(intro)
+        st.html('<br/>')
 
     # Logout
     utils.log_out()
