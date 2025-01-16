@@ -15,26 +15,6 @@
     visibility: hidden;
 }
 
-div.stMetric {
-    background-color: var(--azul);
-    border-radius: 10px;
-    padding: 10px;
-}
-
-label[data-testid="stMetricLabel"] {
-    color: whitesmoke;
-}
-
-div[data-testid="stMetricValue"] > div {
-    color: whitesmoke;
-}
-
-.stMain .stColumn {
-    background-color: var(--cinza);
-    padding: 10px;
-    border-radius: 10px;
-}
-
 .stSidebar button[data-testid="stBaseButton-secondary"] {
     width: 100%;
 }

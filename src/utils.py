@@ -170,8 +170,12 @@ def cycle_plot(df):
 def log_out():
         with st.sidebar:
             sb_cols = st.columns(3)
+            with sb_cols[0]:
+                pass
+            with sb_cols[2]:
+                pass
             with sb_cols[1]:
-                st.session_state['authenticator'].logout()
+                st.session_state['authenticator'].logout('Sair')
 
 delta_time = lambda group: int((group['data'].max() - group['data'].min()).days)
 

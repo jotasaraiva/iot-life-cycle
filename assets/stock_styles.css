@@ -14,3 +14,7 @@
 .stSidebar .stElementToolbar {
     visibility: hidden;
 }
+
+.stSidebar button[data-testid="stBaseButton-secondary"] {
+    width: 100%;
+}
