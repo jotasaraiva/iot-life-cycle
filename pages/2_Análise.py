@@ -7,7 +7,7 @@ from st_supabase_connection import SupabaseConnection, execute_query
 import pathlib
 
 # Page config
-st.set_page_config(page_title="Treevia LC - Timeline", layout='wide')
+st.set_page_config(page_title="Treevia LC - Análise", layout='wide')
 
 # Logo
 logo_path="assets/treevia-logo.png"
