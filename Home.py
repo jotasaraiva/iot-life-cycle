@@ -49,7 +49,7 @@ if st.session_state['authentication_status']:
         min_date = estq_data['data'].dt.date.min()
         clientes = estq_data['cliente'].dropna().unique()
 
-        flt_status = st.multiselect('Status', ('Estoque', 'Cliente', 'Remanufatura'))
+        flt_status = st.multiselect('Status', ('Estoque', 'Cliente', 'Remanufatura', 'Descarte'))
         flt_cliente = st.multiselect('Clientes', clientes) if 'Cliente' in flt_status else None
         flt_date = st.slider('Data de Cadastro', min_value=min_date, max_value=max_date, format='DD/MM/YYYY', value=(min_date, max_date))
 
@@ -59,24 +59,24 @@ if st.session_state['authentication_status']:
     # Renderizando indicadores
     with cols1[0]:
         st.metric(
-            'IoTs em Estoque', 
-            len(estq_data[estq_data['status'] == 'Estoque'])
-        )
-        st.metric(
-            'IoTs saudáveis',
+            'IoTs saudáveis em estoque',
             len(estq_data.loc[(estq_data['defeito'] == False) & (estq_data['status'] == 'Estoque')])
         )
         st.metric(
-            'IoTs defeituosos',
+            'IoTs defeituosos em estoque',
             len(estq_data.loc[(estq_data['defeito'] == True) & (estq_data['status'] == 'Estoque')])
+        )
+        st.metric(
+            'IoTs descartados', 
+            len(estq_data[estq_data['status'] == 'Descarte'])
         )
     with cols1[1]:
         st.metric(
-            'IoTs em Remanufatura',
+            'IoTs em remanufatura',
             len(estq_data.loc[estq_data['status'] == 'Remanufatura'])
         )
         st.metric(
-            'IoTs em Cliente',
+            'IoTs em clientes',
             len(estq_data.loc[estq_data['status'] == 'Cliente'])
         )
         st.metric(
