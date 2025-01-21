@@ -152,6 +152,7 @@ if st.session_state['authentication_status']:
                   use_container_width=True, type='primary')
     if button:
         st.cache_data.clear()
+    st.html('<br/>')
 
     # Logout
     utils.log_out()
