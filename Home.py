@@ -108,7 +108,8 @@ if st.session_state['authentication_status']:
     cols2 = st.columns(1)
     with cols2[0]:
         st.markdown('**Estoque**')
-        st.dataframe(estq_data, height=210, hide_index=True, use_container_width=True)     
+        st.dataframe(estq_data, height=350, hide_index=True, use_container_width=True)     
+    st.html('<br/>')
 
     # Logout
     utils.log_out()
