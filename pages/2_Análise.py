@@ -54,8 +54,9 @@ if st.session_state['authentication_status']:
     except: avg_fail_time = 0
 
     # Criando plots
-    bar_plot = utils.time_bar_plot(time_data, 'status')
-    scatter_plot = utils.cycle_plot(fail_per_cycle)
+    time_bars = utils.time_bar_plot(time_data, 'status')
+    scatter_plot = utils.cycle_scatterplot(fail_per_cycle)
+    cycle_bars = utils.cycle_barplot(time_data)
 
     # Renderizando plots e tabelas
     cols1 = st.columns((.2, .4, .4))
@@ -63,20 +64,24 @@ if st.session_state['authentication_status']:
         st.metric('Nº Médio de Ciclos', avg_num_cycles)
         st.metric('Tempo Médio de Falha', str(avg_fail_time) + ' dias')
     with cols1[1]:
-        st.plotly_chart(bar_plot, use_container_width=True)
+        st.plotly_chart(time_bars, use_container_width=True)
     with cols1[2]:
         st.plotly_chart(scatter_plot, use_container_width=True)
-    cols2 = st.columns((.35, .65))
+    cols2 = st.columns((.35, .25, .4))
     with cols2[0]:
         st.markdown('**N° de Ciclos x Tempo Médio para Falha**')
         st.dataframe(agg_data, use_container_width=True, hide_index=True, height=300)
     with cols2[1]:
-        st.markdown('**Ciclo x Tempo para Falha**')
+        st.markdown('**Ciclo x Tempo de Vida**')
         st.dataframe(fail_per_cycle, use_container_width=True, hide_index=True, height=300)
+    with cols2[2]:
+        st.markdown('**N° de Sensores Acumulado por Ciclo**')
+        st.plotly_chart(cycle_bars)
     cols3 = st.columns(1)
     with cols3[0]:
         st.markdown('**Registros de Timeline**')
         st.dataframe(time_data, use_container_width=True, hide_index=True)
+    st.html('<br/>')
 
     # Logout
     utils.log_out()
