@@ -306,12 +306,10 @@ clientes = [
 ]
 
 problemas = [
-    'Quarentena',
     'Bateria',
     'Mecânica',
     'Não limpa memória',
     'Não conecta na Jiga',
-    'Timeout',
     'Não atualiza',
     'Não faz dump'
 ]
