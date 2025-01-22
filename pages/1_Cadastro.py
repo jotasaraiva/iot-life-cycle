@@ -46,7 +46,7 @@ if st.session_state['authentication_status']:
         # Input de MACs, data e status
         macs = st.text_area('MACs')
         data = st.date_input('Data', format='DD/MM/YYYY')
-        status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura'), default=None)
+        status = st.segmented_control('Status', ('Cliente', 'Estoque','Remanufatura', 'Descarte'), default=None)
 
         # Renderização dinâmica do formulário
         nrows = len(macs.splitlines())
@@ -63,6 +63,8 @@ if st.session_state['authentication_status']:
             if defeito:
                 diag = st.selectbox('Diagnóstico', tuple(utils.problemas))
         elif status == 'Remanufatura':
+            defeito = False
+        elif status == 'Descarte':
             defeito = False
         elif status == None:
             defeito = False
@@ -94,7 +96,7 @@ if st.session_state['authentication_status']:
                             disable_button = False
                 elif not defeito:
                     disable_button = False
-        if status == 'Remanufatura':
+        if status == 'Remanufatura' or 'Descarte':
             disable_button = False
 
     # Construção dos novos registros para o banco
@@ -112,7 +114,7 @@ if st.session_state['authentication_status']:
         })
     
     # Resgatar ou limpar lote de recebimento e interno
-    if (status in ('Remanufatura', 'Cliente')) or (status == 'Estoque' and origem == 'Cliente'):
+    if (status in ('Remanufatura', 'Cliente', 'Descarte')) or (status == 'Estoque' and origem == 'Cliente'):
         new_data['lote_recebimento'] = list([
             utils.get_batch(tl_data, 'macs', mac, 'lote_recebimento', 'data')
             for mac in macs.splitlines()
@@ -150,6 +152,7 @@ if st.session_state['authentication_status']:
                   use_container_width=True, type='primary')
     if button:
         st.cache_data.clear()
+    st.html('<br/>')
 
     # Logout
     utils.log_out()

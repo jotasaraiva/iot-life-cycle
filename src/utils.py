@@ -119,7 +119,7 @@ def get_cycle(df, match_column, match_value, target_column, date_column, increas
 def convert_date(x):
     return datetime.strptime(x, '%Y-%m-%d').date()
 
-# Média condicional (se tiver um valor apenas, retorna None
+# Média condicional (se tiver apenas um valor, retorna None
 # se tiver mais de um valor, o cálculo é soma(x)/(len(x)-1)
 def custom_mean(x):
     if len(x) > 1:
@@ -175,13 +175,31 @@ def time_bar_plot(df, var):
     return fig
 
 # Scatterplot de ciclo x tempo para falha
-def cycle_plot(df):
+def cycle_scatterplot(df):
     fig = px.scatter(df, x='ciclo', y='fail_time', hover_data=['macs'])
     fig.update_layout(
         height=200, 
         paper_bgcolor='rgba(0,0,0,0)', 
         plot_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=0, r=0, t=0, b=0))
+    return fig
+
+# Plot de barra de contagem de sensores em cada ciclo
+def cycle_barplot(df):
+    bar_data = (
+        df
+        .groupby('ciclo')
+        .size()
+        .reset_index(name='counts')
+    )
+
+    fig = fig = px.bar(bar_data, x='ciclo', y='counts', orientation='v')
+    fig.update_layout(
+        height=300, 
+        paper_bgcolor='rgba(0,0,0,0)', 
+        plot_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=0, r=0, t=0, b=0))
+
     return fig
 
 # Botão de logout
@@ -288,12 +306,10 @@ clientes = [
 ]
 
 problemas = [
-    'Quarentena',
     'Bateria',
     'Mecânica',
     'Não limpa memória',
     'Não conecta na Jiga',
-    'Timeout',
     'Não atualiza',
     'Não faz dump'
 ]

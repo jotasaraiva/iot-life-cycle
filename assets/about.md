@@ -12,6 +12,7 @@ O sistema IoT Life Cycle funciona primeiramente como uma ferramenta básica de g
   - Lotes de Recebimento e Interno: Subcategorias para registro de lotes de sensores recebidos do fornecedor
 - **Cliente**: Sensor que está sob a posse de um cliente ou está atualmente instalado em algum projeto, e;
 - **Remanufatura**: Sensor que está atualmente na posse do fornecedor para que seja restaurado.
+- **Descarte** Sensor que foi avariado ou deteriorado de uma forma irrecuperável, passível de descarte.
 
 ### Monitoramento
 
