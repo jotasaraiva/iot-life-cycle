@@ -91,7 +91,7 @@ if st.session_state['authentication_status']:
 
         defeito_pie_data = estq_data.groupby(['defeito']).size().reset_index(name='counts')
         defeito_pie_data['defeito'] = defeito_pie_data['defeito'].replace({True: 'Defeituosos', False: 'Saudáveis'})
-        defeito_pie = utils.pie_plotly(defeito_pie_data, 'defeito', 'counts', 'Defeituosos', 140)
+        defeito_pie = utils.pie_plotly(defeito_pie_data, 'defeito', 'counts', 'Em estoque', 140)
         st.plotly_chart(defeito_pie, use_container_width=True)
     # Rendering plot de barra
     with cols1[3]:
