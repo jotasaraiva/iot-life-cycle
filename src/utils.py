@@ -139,6 +139,11 @@ def fail_time(df):
 
     return fail_per_cycle
 
+# Checa se uma lista tem dados duplicados
+def has_duplicates(x):
+    res = len(x) != len(set(x))
+    return res
+
 # Calcular tempo médio até a falha
 def avg_fail_time(df):
     fail_per_cycle = fail_time(df)

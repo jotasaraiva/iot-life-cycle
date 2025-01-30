@@ -76,8 +76,12 @@ if st.session_state['authentication_status']:
                 globals()[var] = None
     make_exist(['cliente', 'lote_recebimento', 'lote_treevia', 'origem', 'diag', 'ciclo'])
 
+    # validação de macs repetidos
+    if utils.has_duplicates(macs.splitlines()):
+        st.error('Os dados inseridos possuem MACs repetidos.')
+
     # validação de dados do formulário
-    if macs != '':
+    if macs != '' and not utils.has_duplicates(macs.splitlines()):
         ciclo = None
         if status == 'Cliente':
             if cliente != '':
