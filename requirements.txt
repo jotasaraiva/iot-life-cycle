@@ -1,6 +1,6 @@
-numpy
-pandas
-plotly
+numpy==1.26.4
+pandas==2.2.2
+plotly==5.14.1
 streamlit==1.40.2
-streamlit-authenticator
-st-supabase-connection
+streamlit-authenticator==0.4.1
+st-supabase-connection==2.0.1
