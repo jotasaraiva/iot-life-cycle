@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from src import utils
-from st_supabase_connection import SupabaseConnection, execute_query
+from st_supabase_connection import SupabaseConnection
 import pathlib
 
 # Configuração da página
@@ -32,7 +32,7 @@ if st.session_state['authentication_status']:
     
     # Query da database
     conn = st.connection("supabase", type=SupabaseConnection)
-    rows = execute_query(conn.table("timeline").select("*"), ttl="5m")
+    rows = conn.table("timeline").select("*").execute()
     time_data = pd.DataFrame(rows.data)
     time_data['data'] = pd.to_datetime(time_data['data'])
     max_date = time_data['data'].dt.date.max()

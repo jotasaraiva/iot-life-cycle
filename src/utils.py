@@ -5,7 +5,7 @@ import numpy as np
 import plotly.express as px
 from datetime import datetime
 import plotly.graph_objects as go
-from st_supabase_connection import SupabaseConnection, execute_query
+from st_supabase_connection import SupabaseConnection
 
 # Funções para resgatar dados da API Device (não usadas)
 @st.cache_data(show_spinner="Carregando Estoque...")
@@ -55,17 +55,13 @@ def filter_home(df, clientes, status, dates):
 
 # Fazer update no banco
 def update_db(data, conn, db):
-    response = execute_query(
-        conn.table(db).insert(data), ttl=0
-    )
+    response = conn.table(db).insert(data).execute()
 
     st.toast(body=response)
 
 # Fazer upsert no banco
 def upsert_db(data, conn, db):
-    response = execute_query(
-        conn.table(db).upsert(data, on_conflict=['macs'])
-    )
+    response = conn.table(db).upsert(data, on_conflict=['macs']).execute()
 
     st.toast(body=response)
 
