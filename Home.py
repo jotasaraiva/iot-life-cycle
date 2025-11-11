@@ -3,7 +3,7 @@ import streamlit_authenticator as stauth
 import pandas as pd
 import plotly.express as px
 from src import utils
-from st_supabase_connection import SupabaseConnection, execute_query
+from st_supabase_connection import SupabaseConnection
 import pathlib
 
 # Configuração da página
@@ -38,7 +38,7 @@ if st.session_state['authentication_status']:
 
     # Query da database
     conn = st.connection("supabase", type=SupabaseConnection)
-    rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
+    rows = conn.table("estoque").select("*").execute()
     estq_data = pd.DataFrame(rows.data)
     estq_data['data'] = pd.to_datetime(estq_data['data'])
     cols1 = st.columns((.2, .2, .2, .4))

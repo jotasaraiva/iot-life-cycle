@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 from src import utils
 import json
-from st_supabase_connection import SupabaseConnection, execute_query
+from st_supabase_connection import SupabaseConnection
 import pathlib
 
 # Configuração da página
@@ -33,9 +33,9 @@ if st.session_state['authentication_status']:
 
     # Query da database
     conn = st.connection("supabase", type=SupabaseConnection)
-    estq_rows = execute_query(conn.table("estoque").select("*"), ttl="5m")
+    estq_rows = conn.table("estoque").select("*").execute()
     estq_data = pd.DataFrame(estq_rows.data)
-    tl_rows = execute_query(conn.table('timeline').select("*"), ttl="5m")
+    tl_rows = conn.table('timeline').select("*").execute()
     tl_data = pd.DataFrame(tl_rows.data)
 
     st.markdown('## Cadastro de Estoque')
